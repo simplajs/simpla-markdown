@@ -1,0 +1,32 @@
+{
+  "name": "simpla-markdown",
+  "version": "0.0.0",
+  "authors": [
+    "Simpla"
+  ],
+  "description": "A Simpla element that lets you write content in markdown, automatically rendered to HTML",
+  "keywords": [
+    "web-component",
+    "polymer",
+    "simpla-markdown"
+  ],
+  "main": "simpla-markdown.html",
+  "license": "MIT",
+  "homepage": "https://github.com/SimplaElements/simpla-markdown/",
+  "ignore": [
+    "*",
+    "!*.html",
+    "!LICENSE"
+  ],
+  "dependencies": {
+    "webcomponentsjs": "^0.7.14",
+    "polymer": "^1.6.0",
+    "simpla-styles": "^0.2.0",
+    "iron-icon": "^1.0.12",
+    "iron-icons": "^1.2.0"
+  },
+  "devDependencies": {
+    "web-component-tester": "^4.0.0",
+    "simpla": "simplaio/simpla#v2.0.0-preview"
+  }
+}

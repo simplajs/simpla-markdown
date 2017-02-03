@@ -1,0 +1,533 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../simpla-styles/simpla-styles.html" async>
+
+<!--
+  Toolbar icons
+  HACK - can't get iron-icon working, can't scope font-face to shadow root
+  Multiple imports for iron-icons better than polluting the global env, fix them
+-->
+<style>
+  @font-face {
+    font-family: 'simpla markdown icons';
+    src: url(data:application/font-woff;charset=utf-8;base64,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) format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+</style>
+
+<dom-module id="simpla-markdown-editor">
+  <template>
+    <style>
+    /* Base vendor styles
+       NPM import resolved with postcss-import */
+    @import 'simplemde/dist/simplemde.min.css';
+
+     :host, *, *::before, *::after {
+        box-sizing: border-box;
+        -moz-osx-font-smoothing: grayscale;
+         -webkit-font-smoothing: antialiased;
+                 font-smoothing: antialiased;
+      }
+
+      :host {
+        position: fixed;
+        display: flex;
+        top: 0;
+        left: 0;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+
+      /* Fake display none for transitions */
+      :host(:not([open])) {
+        position: absolute;
+        height: 0;
+        width: 0;
+        visibility: hidden;
+        overflow: hidden;
+      }
+
+      .overlay {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(0,0,0,0.1);
+        opacity: 0;
+        cursor: pointer;
+        transition: opacity 250ms ease;
+        transition-delay: 125ms;
+      }
+
+      :host([active]) .overlay {
+        opacity: 1;
+        transition-duration: 350ms;
+        transition-delay: 0;
+      }
+
+      .editor {
+        display: flex;
+        flex-direction: column;
+        height: 90%;
+        width: 90%;
+        background: white;
+        font-family: var(--simpla-font-family);
+        font-size: var(--simpla-scale-0);
+        line-height: 1.6;
+        padding: var(--simpla-scale-1) var(--simpla-scale-3);
+        border-radius: var(--simpla-border-radius);
+        box-shadow: var(--simpla-elevation-4);
+        z-index: 1;
+        transform: translateY(15%);
+        opacity: 0;
+        transition: transform 150ms var(--simpla-easing-accelerate),
+                    opacity 120ms ease;
+      }
+
+      :host([active]) .editor {
+        transform: translateY(0);
+        opacity: 1;
+        transition: transform 275ms var(--simpla-easing-decelerate),
+                    opacity 120ms ease;
+        transition-delay: 200ms;
+      }
+
+      .exit {
+        position: absolute;
+        display: flex;
+        top: 0;
+        right: 0;
+        align-items: center;
+        justify-content: center;
+        transform: translate(30%, -30%);
+        background: white;
+        color: var(--simpla-grey-500);
+        font-size: var(--simpla-scale-00);
+        width: var(--simpla-scale-3);
+        height: var(--simpla-scale-3);
+        border-radius: 50%;
+        box-shadow: var(--simpla-elevation-1);
+        cursor: pointer;
+        transition-property: transform, box-shadow;
+        transition: 200ms var(--simpla-easing-standard);
+      }
+
+      .exit:hover {
+        transform: translate(30%, -30%) scale(1.05);
+        color: var(--simpla-grey-700);
+      }
+
+      .exit::before {
+        font-family: 'simpla markdown icons';
+        content: '\e5cd';
+      }
+
+      .toolbar {
+        display: flex;
+        margin: 0.5em 0 2em;
+        overflow: scroll;
+      }
+
+      .toolbar__tool {
+        display: inline-flex;
+        align-items: center;
+        font-size: var(--simpla-scale-1);
+        color: var(--simpla-grey-500);
+        margin: 0 0.5em;
+        cursor: pointer;
+      }
+
+      .toolbar__tool:first-child {
+        margin-left: 0;
+      }
+
+      .toolbar__tool:last-child {
+        margin-right: 0;
+      }
+
+      .toolbar__tool:hover {
+        color: var(--simpla-primary-color);
+      }
+
+      .toolbar__separator {
+        border-left: 1px solid var(--simpla-grey-300);
+        height: 1.15em;
+        margin: 0 0.8em;
+      }
+
+      /* HACK - these should be replaced with iron-icons */
+      .toolbar__tool[data-icon]::before {
+        display: inline-block;
+        font-family: 'simpla markdown icons';
+        line-height: 1;
+      }
+
+      .toolbar__tool[data-icon="bold"]::before {
+        content: '\e238';
+      }
+
+      .toolbar__tool[data-icon="italic"]::before {
+        content: '\e23f';
+      }
+
+      .toolbar__tool[data-icon="title"]::before {
+        content: '\e264';
+      }
+
+      .toolbar__tool[data-icon="ul"]::before {
+        content: '\e241';
+      }
+
+      .toolbar__tool[data-icon="ol"]::before {
+        content: '\e242';
+      }
+
+      .toolbar__tool[data-icon="link"]::before {
+        content: '\e157';
+      }
+
+      .toolbar__tool[data-icon="image"]::before {
+        content: '\e410';
+      }
+
+      .toolbar__tool[data-icon="clear"]::before {
+        content: '\e239';
+      }
+
+      /* Vendor overwrites */
+      .CodeMirror,
+      .CodeMirror-scroll {
+        min-height: 0 !important;
+      }
+
+      .CodeMirror {
+        flex: 1;
+        min-height: 0 !important;
+        border: 0 !important;
+        padding: 0 !important;
+      }
+
+      .CodeMirror-scroll {
+        height: 100% !important;
+        min-height: 0 !important;
+      }
+
+      .editor-statusbar {
+        font-size: var(--simpla-scale-000) !important;
+        color: var(--simpla-grey-500) !important;
+      }
+
+      .editor-statusbar .words::before {
+        content: '' !important;
+      }
+
+      .editor-statusbar .words::after {
+        content: ' words';
+      }
+
+      .cm-header {
+        line-height: 1.3 !important;
+      }
+
+      /* Patch hidden prop on IE */
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+
+    <div class="overlay"
+      on-tap="exit"
+      on-transitionend="_closeOnInactive">
+    </div>
+
+    <div class="editor">
+
+      <a class="exit" on-tap="exit"></a>
+
+      <!-- Optional toolbar -->
+      <template is="dom-if" if="[[toolbar]]">
+        <div class="toolbar">
+          <a class="toolbar__tool"
+            on-tap="format"
+            data-icon="bold"
+            data-action="toggleBold"
+            title="Bold">
+          </a>
+
+          <a class="toolbar__tool"
+            on-tap="format"
+            data-icon="italic"
+            data-action="toggleItalic"
+            title="Italic">
+          </a>
+
+          <div class="toolbar__separator"></div>
+
+          <a class="toolbar__tool"
+            on-tap="format"
+            data-icon="title"
+            data-action="toggleHeadingSmaller"
+            title="Heading">
+          </a>
+
+          <a class="toolbar__tool"
+            on-tap="format"
+            data-icon="ul"
+            data-action="toggleUnorderedList"
+            title="Unordered list">
+          </a>
+
+          <a class="toolbar__tool"
+            on-tap="format"
+            data-icon="ol"
+            data-action="toggleOrderedList"
+            title="Ordered list">
+          </a>
+
+          <div class="toolbar__separator"></div>
+
+          <a class="toolbar__tool"
+            on-tap="format"
+            data-icon="link"
+            data-action="drawLink"
+            title="Insert link">
+          </a>
+
+          <a class="toolbar__tool"
+            on-tap="format"
+            data-icon="image"
+            data-action="drawImage"
+            title="Insert image">
+          </a>
+
+          <div class="toolbar__separator"></div>
+
+          <a class="toolbar__tool"
+            on-tap="format"
+            data-icon="clear"
+            data-action="cleanBlock" title="Clear formatting">
+          </a>
+        </div>
+      </template>
+
+      <!-- Editor instantiated with SimpleMDE -->
+      <textarea id="editor" hidden></textarea>
+
+    </div>
+  </template>
+  <script>
+    import SimpleMde from 'simplemde';
+    import readingTime from 'reading-time';
+
+    const SIMPLEMDE_CONFIG = {
+      autoDownloadFontAwesome: false,
+      indentWithTabs: false,
+      styleSelectedText: false,
+      tabSize: 4,
+      toolbarTips: false,
+      spellChecker: false,
+      blockStyles: {
+        italic: '_'
+      },
+      insertTexts: {
+        image: ['![](', ')'],
+        link: ['[', ']()']
+      },
+      toolbar: [],
+      shortcuts: {
+        'toggleSideBySide': null,
+        'toggleFullScreen': null,
+        'togglePreview': null,
+        'toggleUnorderedList': null,
+        'toggleOrderedList': null,
+        'cleanBlock': null,
+        'drawImage': null
+      }
+    };
+
+    class SimplaMarkdownEditor {
+      beforeRegister() {
+        this.is = 'simpla-markdown-editor';
+
+        this.properties = {
+
+          /**
+           * Markdown source
+           * @type {String}
+           */
+          value: {
+            type: String,
+            notify: true
+          },
+
+          /**
+           * Whether the editor is active
+           * @type {Boolean}
+           */
+          active: {
+            type: Boolean,
+            observer: '_activeChanged',
+            reflectToAttribute: true,
+            notify: true
+          },
+
+          /**
+           * Whether the editor is visibly open
+           * Used for transitions
+           * @type {Boolean}
+           */
+          open: {
+            type: Boolean,
+            reflectToAttribute: true,
+            notify: true
+          },
+
+          /**
+           * Whether to show the toolbar
+           * @type {Boolean}
+           */
+          toolbar: Boolean,
+
+          /**
+           * SimpleMDE instance
+           * @type {Object}
+           */
+          _editor: Object,
+
+          /**
+           * Current value of the editor
+           * @type {String}
+           */
+          _currentValue: String
+
+        };
+
+        this.listeners = {
+          'keydown': '_exitOnHotkeys'
+        }
+      }
+
+      /**
+       * Init SimpleMDE editor
+       * Called by Polymer on element attach
+       * @return {undefined}
+       */
+      attached() {
+        let editor = new SimpleMde(Object.assign({
+          element: this.$['editor'],
+          status: [
+            'words',
+            {
+              className: 'readingTime',
+              defaultValue: (el) => el.innerHTML = readingTime(this.value || '').text,
+              onUpdate: (el) => el.innerHTML = readingTime(this._currentValue || '').text
+            }
+          ],
+        }, SIMPLEMDE_CONFIG));
+
+        editor.codemirror.on('change', () => this._currentValue = editor.value());
+
+        this._editor = editor;
+      }
+
+      /**
+       * Observer for the active property
+       * @param  {Boolean} active Current state of active prop
+       * @return {undefined}
+       */
+      _activeChanged(active) {
+        if (active) {
+          this.open = true;
+          this._toggleBodyLock(true);
+          this._focusEditor();
+          this._syncValue('in');
+        } else {
+          this._toggleBodyLock(false);
+          this._syncValue('out');
+        }
+      }
+
+      /**
+       * Formatter function
+       * Calls action (from event target) on SimpleMDE
+       * @param  {Event} e Tap event
+       * @return {undefined}
+       */
+      format(e) {
+        let action = Polymer.dom(e).rootTarget.dataset.action;
+
+        this._editor[action]();
+      }
+
+      /**
+       * Utility function to set active false
+       * @return {undefined}
+       */
+      exit() {
+        this.active = false;
+      }
+
+      /**
+       * Toggles locked document body scrolling
+       * @param {Boolean} state whether to lock or unlock body
+       * @return {undefined}
+       */
+      _toggleBodyLock(state) {
+        document.body.style.overflow = state ? 'hidden' : '';
+      }
+
+      /**
+       * Gives editor focus at the beginning of the document
+       * @return {undefined}
+       */
+      _focusEditor() {
+        this._editor.codemirror.focus();
+        this._editor.codemirror.execCommand('goDocStart');
+      }
+
+      /**
+       * Manually bind the value property in and out of the editor
+       * @param  {String} direction in|out Direction to sync the value
+       * @return {undefined}
+       */
+      _syncValue(direction) {
+        if (direction === 'out') {
+          this.value = this._editor.value()
+        } else {
+          this._editor.value(this.value);
+        }
+      }
+
+      /**
+       * Exit (and 'save') the editor on cmd/ctrl+enter
+       * Bound to keydown events with Polymer
+       * @param  {Event} e Keydown event on host
+       * @return {undefined}
+       */
+      _exitOnHotkeys(e) {
+        let cmdEnter = e.keyCode === 13 && e.metaKey,
+            escape = e.keyCode === 27;
+
+        if (cmdEnter || escape) {
+          this.active = false;
+        }
+      }
+
+      /**
+       * Set open to false at end of closing CSS transition
+       * @param  {Event} e Transitionend event from DOM
+       * @return {undefined}
+       */
+      _closeOnInactive(e) {
+        if (!this.active) {
+          this.open = false;
+        }
+      }
+    }
+    Polymer(SimplaMarkdownEditor);
+  </script>
+</dom-module>

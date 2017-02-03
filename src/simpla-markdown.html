@@ -1,0 +1,255 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="simpla-markdown">
+  <template>
+    <style>
+      :host, *, *::before, *::after {
+        box-sizing: border-box;
+        -moz-osx-font-smoothing: grayscale;
+         -webkit-font-smoothing: antialiased;
+                 font-smoothing: antialiased;
+      }
+
+      :host {
+        display: block;
+        position: relative;
+      }
+
+      /* Hide content when editor is open */
+      .content[data-editing] {
+        opacity: 0;
+        transition: opacity 150ms ease;
+      }
+
+      .content__shade {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(0,0,0,0.1);
+        border-radius: var(--simpla-border-radius);
+        cursor: pointer;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 200ms ease;
+      }
+
+      .content__shade:hover {
+        opacity: 1;
+      }
+
+      .content__placeholder {
+        display: inline-block;
+        padding: 0.3em;
+        opacity: 0.45;
+      }
+
+      .content:hover .content__placeholder {
+        opacity: 0.65;
+      }
+
+      /* Patch hidden prop on IE */
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+
+    <!-- Editor imported on editable true -->
+    <simpla-markdown-editor
+      id="markdown-editor"
+      value="{{_value}}"
+      active="{{active}}"
+      toolbar="[[!hideToolbar]]"
+      hidden$="[[!editable]]">
+    </simpla-markdown-editor>
+
+    <div class="content" data-editing$="[[active]]">
+
+      <!-- Edit trigger UI -->
+      <template is="dom-if" if="[[editable]]">
+        <div class="content__shade"
+          hidden$="[[active]]"
+          on-tap="_goActive">
+        </div>
+
+        <span class="content__placeholder"
+          hidden$="[[_hasContent(value)]]">
+          [[placeholder]]
+        </span>
+      </template>
+
+      <!-- Rendered content (Light DOM) -->
+      <content></content>
+
+    </div>
+  </template>
+
+  <script>
+    import MarkdownIt from 'markdown-it';
+    import simpla from './behaviors/simpla';
+
+    const EDITOR_COMPONENT = 'simpla-markdown-editor.html';
+
+    class SimplaMarkdown {
+      beforeRegister() {
+        this.is = 'simpla-markdown';
+
+        this.properties = {
+
+          /**
+           * Markdown source content
+           * Fetched from Simpla
+           * @type {String}
+           */
+          value: {
+            type: String,
+            observer: '_render',
+            notify: true
+          },
+
+          /**
+           * Internal markdown source
+           * Set to Simpla
+           * @type {Object}
+           */
+          _value: String,
+
+          /**
+           * Whether element is editable
+           * @type {Boolean}
+           */
+          editable: {
+            type: Boolean,
+            observer: '_importEditor',
+            reflectToAttribute: true,
+            notify: true
+          },
+
+          /**
+           * Whether editor is open
+           * @type {Boolean}
+           */
+          active: {
+            type: Boolean,
+            notify: true
+          },
+
+          /**
+           * Placeholder to show if editable and no content
+           * @type {String}
+           */
+          placeholder: {
+            type: String,
+            value: 'Tap to start writing...'
+          },
+
+          /**
+           * Render HTML in source markdown
+           * @type {Boolean}
+           */
+          allowHtml: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
+           * Automatically render URLs as anchors
+           * @type {Boolean}
+           */
+          linkify: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
+           * Hide the toolbar
+           * @type {Object}
+           */
+          hideToolbar: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
+           * Markdown-it instance
+           * @type {Object}
+           */
+          _parser: Object,
+
+          /**
+           * Whether editor component has been imported
+           * @type {Boolean}
+           */
+          _editorImported: Boolean
+
+        };
+      }
+
+      get behaviors() {
+        return [ simpla ];
+      }
+
+      /**
+       * Initialises markdown-it instance
+       * Called by Polymer on element creation
+       * @return {undefined}
+       */
+      created() {
+        this._parser = new MarkdownIt({
+          html: this.allowHtml,
+          linkify: this.linkify,
+          typographer: true
+        });
+      }
+
+      /**
+       * Imports editor component when editable true
+       * @param  {Boolean} editable Current value of the editable property
+       * @return {undefined}
+       */
+      _importEditor(editable) {
+        let link;
+
+        if (!editable || this._editorImported) {
+          return;
+        }
+
+        link =  document.createElement('link');
+        link.rel = 'import';
+        link.href = this.resolveUrl(EDITOR_COMPONENT);
+        link.setAttribute('async', '');
+        document.head.appendChild(link);
+
+        this._editorImported = true;
+      }
+
+      /**
+       * Renders markdown source to innerHTML (Light DOM)
+       * @param  {String} value Markdown source to render
+       * @return {undefined}
+       */
+      _render(value) {
+        Polymer.dom(this).innerHTML = this._parser.render(value)
+      }
+
+      /**
+       * Utility function to set active true
+       * @return {undefined}
+       */
+      _goActive() {
+        this.active = true;
+      }
+
+      /**
+       * Utilty function to check if value has content
+       * @param  {String}  value Value property
+       * @return {Boolean}       Coerced Boolean of value property
+       */
+      _hasContent(value) {
+        return !!value.trim();
+      }
+    }
+    Polymer(SimplaMarkdown);
+  </script>
+</dom-module>
