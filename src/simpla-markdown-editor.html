@@ -495,15 +495,20 @@
        * @return {undefined}
        */
       _syncValue(direction) {
-        if (direction === 'out') {
-          this.value = this._editor.value()
-        } else {
+        switch (direction) {
+        case 'in':
           this._editor.value(this.value);
+          break;
+        case 'out':
+          this.value = this._editor.value()
+          break;
+        default:
+          console.warn(direction, 'is not a valid argument');
         }
       }
 
       /**
-       * Exit (and 'save') the editor on cmd/ctrl+enter
+       * Exit (and 'save') the editor on certain hotkeys
        * Bound to keydown events with Polymer
        * @param  {Event} e Keydown event on host
        * @return {undefined}
