@@ -4,7 +4,7 @@
   "authors": [
     "Simpla"
   ],
-  "description": "A Simpla element that lets you write content in markdown, automatically rendered to HTML",
+  "description": "A Simpla element for writing articles in markdown",
   "keywords": [
     "web-component",
     "polymer",

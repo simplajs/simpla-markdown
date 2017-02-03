@@ -1,7 +1,7 @@
 {
   "name": "simpla-markdown",
   "version": "0.0.0",
-  "description": "A Simpla element that lets you write content in markdown, automatically rendered to HTML",
+  "description": "A Simpla element for writing articles in markdown",
   "main": "simpla-markdown.html",
   "scripts": {
     "test": "gulp test:local"
