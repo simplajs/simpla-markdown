@@ -21,9 +21,9 @@
   "dependencies": {
     "webcomponentsjs": "^0.7.14",
     "polymer": "^1.6.0",
-    "simpla-styles": "^0.2.0",
-    "iron-icon": "^1.0.12",
-    "iron-icons": "^1.2.0"
+    "simpla-styles": "^0.5.0",
+    "iron-icon": "PolymerElements/iron-icon#^1.0.12",
+    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^1.1.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0",

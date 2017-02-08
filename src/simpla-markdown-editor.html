@@ -1,19 +1,24 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../simpla-styles/simpla-styles.html" async>
+<link rel="import" href="../simpla-styles/simpla-styles.html">
+<link rel="import" href="../iron-iconset-svg/iron-iconset-svg.html">
+<link rel="import" href="../iron-icon/iron-icon.html" async>
 
-<!--
-  Toolbar icons
-  HACK - can't get iron-icon working, can't scope font-face to shadow root
-  Multiple imports for iron-icons better than polluting the global env, fix them
--->
-<style>
-  @font-face {
-    font-family: 'simpla markdown icons';
-    src: url(data:application/font-woff;charset=utf-8;base64,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) format('woff');
-    font-weight: normal;
-    font-style: normal;
-  }
-</style>
+<!-- Material icons cherry picked from iron-icons -->
+<iron-iconset-svg name="simpla-markdown">
+  <svg>
+    <defs>
+      <g id="check"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></g>
+      <g id="format-bold"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></g>
+      <g id="format-italic"><path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/></g>
+      <g id="format-list-bulleted"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></g>
+      <g id="format-list-numbered"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></g>
+      <g id="format-clear"><path d="M3.27 5L2 6.27l6.97 6.97L6.5 19h3l1.57-3.66L16.73 21 18 19.73 3.55 5.27 3.27 5zM6 5v.18L8.82 8h2.4l-.72 1.68 2.1 2.1L14.21 8H20V5H6z"/></g>
+      <g id="title"><path d="M5 4v3h5.5v12h3V7H19V4z"/></g>
+      <g id="insert-link"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></g>
+      <g id="insert-photo"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></g>
+    </defs>
+  </svg>
+</iron-iconset-svg>
 
 <dom-module id="simpla-markdown-editor">
   <template>
@@ -59,14 +64,14 @@
         background: var(--simpla-light-black);
         opacity: 0;
         cursor: pointer;
-        transition: opacity 250ms ease;
-        transition-delay: 125ms;
+        transition: opacity 300ms ease;
+        transition-delay: 100ms;
       }
 
       :host([active]) .overlay {
         opacity: 1;
-        transition-duration: 350ms;
         transition-delay: 0;
+        transition-duration: 350ms
       }
 
       .editor {
@@ -76,7 +81,7 @@
         width: 90%;
         background: white;
         font-family: var(--simpla-font-family);
-        font-size: var(--simpla-scale-0);
+        font-size: var(--simpla-scale-1);
         line-height: 1.6;
         padding: var(--simpla-scale-1) var(--simpla-scale-3);
         border-radius: var(--simpla-border-radius);
@@ -84,8 +89,8 @@
         z-index: 1;
         transform: translateY(15%);
         opacity: 0;
-        transition: transform 150ms var(--simpla-easing-accelerate),
-                    opacity 120ms ease;
+        transition: transform 200ms var(--simpla-easing-accelerate),
+                    opacity 150ms ease;
       }
 
       :host([active]) .editor {
@@ -106,7 +111,6 @@
         transform: translate(30%, -30%);
         background: white;
         color: var(--simpla-grey-500);
-        font-size: var(--simpla-scale-00);
         width: var(--simpla-scale-3);
         height: var(--simpla-scale-3);
         border-radius: 50%;
@@ -121,9 +125,9 @@
         color: var(--simpla-grey-700);
       }
 
-      .exit::before {
-        font-family: 'simpla markdown icons';
-        content: '\e5cd';
+      .exit__icon {
+        --iron-icon-width: var(--simpla-scale-0);
+        --iron-icon-height: var(--simpla-scale-0);
       }
 
       .toolbar {
@@ -153,49 +157,15 @@
         color: var(--simpla-primary-color);
       }
 
+      .toolbar__tool__icon {
+        --iron-icon-width: var(--simpla-scale-1);
+        --iron-icon-height: var(--simpla-scale-1);
+      }
+
       .toolbar__separator {
         border-left: 1px solid var(--simpla-grey-300);
         height: 1.15em;
         margin: 0 0.8em;
-      }
-
-      /* HACK - these should be replaced with iron-icons */
-      .toolbar__tool[data-icon]::before {
-        display: inline-block;
-        font-family: 'simpla markdown icons';
-        line-height: 1;
-      }
-
-      .toolbar__tool[data-icon="bold"]::before {
-        content: '\e238';
-      }
-
-      .toolbar__tool[data-icon="italic"]::before {
-        content: '\e23f';
-      }
-
-      .toolbar__tool[data-icon="title"]::before {
-        content: '\e264';
-      }
-
-      .toolbar__tool[data-icon="ul"]::before {
-        content: '\e241';
-      }
-
-      .toolbar__tool[data-icon="ol"]::before {
-        content: '\e242';
-      }
-
-      .toolbar__tool[data-icon="link"]::before {
-        content: '\e157';
-      }
-
-      .toolbar__tool[data-icon="image"]::before {
-        content: '\e410';
-      }
-
-      .toolbar__tool[data-icon="clear"]::before {
-        content: '\e239';
       }
 
       /* Vendor overwrites */
@@ -217,7 +187,7 @@
       }
 
       .editor-statusbar {
-        font-size: var(--simpla-scale-000) !important;
+        font-size: var(--simpla-scale-00) !important;
         color: var(--simpla-grey-500) !important;
       }
 
@@ -233,6 +203,27 @@
         line-height: 1.3 !important;
       }
 
+      .cm-header-1 {
+        font-size: 1.8em !important;
+      }
+
+      .cm-header-2 {
+        font-size: 1.6em !important;
+      }
+
+      .cm-header-3 {
+        font-size: 1.4em !important;
+      }
+
+      .cm-header-4 {
+        font-size: 1.2em !important;
+      }
+
+      .cm-header-5,
+      .cm-header-6 {
+        font-size: 1em !important;
+      }
+
       /* Patch hidden prop on IE */
       [hidden] {
         display: none !important;
@@ -246,70 +237,91 @@
 
     <div class="editor">
 
-      <a class="exit" on-tap="exit"></a>
+      <a class="exit" on-tap="exit">
+        <iron-icon class="exit__icon"
+          icon="simpla-markdown:check">
+        </iron-icon>
+      </a>
 
       <!-- Optional toolbar -->
       <template is="dom-if" if="[[toolbar]]">
         <div class="toolbar">
-          <a class="toolbar__tool"
-            on-tap="format"
-            data-icon="bold"
-            data-action="toggleBold"
-            title="Bold">
+          <a class="toolbar__tool" title="Bold">
+            <iron-icon
+              class="toolbar__tool__icon"
+              icon="simpla-markdown:format-bold"
+              data-action="toggleBold"
+              on-tap="format">
+            </iron-icon>
           </a>
 
-          <a class="toolbar__tool"
-            on-tap="format"
-            data-icon="italic"
-            data-action="toggleItalic"
-            title="Italic">
-          </a>
-
-          <div class="toolbar__separator"></div>
-
-          <a class="toolbar__tool"
-            on-tap="format"
-            data-icon="title"
-            data-action="toggleHeadingSmaller"
-            title="Heading">
-          </a>
-
-          <a class="toolbar__tool"
-            on-tap="format"
-            data-icon="ul"
-            data-action="toggleUnorderedList"
-            title="Unordered list">
-          </a>
-
-          <a class="toolbar__tool"
-            on-tap="format"
-            data-icon="ol"
-            data-action="toggleOrderedList"
-            title="Ordered list">
+          <a class="toolbar__tool" title="Italic">
+            <iron-icon
+              class="toolbar__tool__icon"
+              icon="simpla-markdown:format-italic"
+              data-action="toggleItalic"
+              on-tap="format">
+            </iron-icon>
           </a>
 
           <div class="toolbar__separator"></div>
 
-          <a class="toolbar__tool"
-            on-tap="format"
-            data-icon="link"
-            data-action="drawLink"
-            title="Insert link">
+          <a class="toolbar__tool" title="Heading">
+            <iron-icon
+              class="toolbar__tool__icon"
+              icon="simpla-markdown:title"
+              data-action="toggleHeadingSmaller"
+              on-tap="format">
+            </iron-icon>
           </a>
 
-          <a class="toolbar__tool"
-            on-tap="format"
-            data-icon="image"
-            data-action="drawImage"
-            title="Insert image">
+          <a class="toolbar__tool" title="Unordered list">
+            <iron-icon
+              class="toolbar__tool__icon"
+              icon="simpla-markdown:format-list-bulleted"
+              data-action="toggleUnorderedList"
+              on-tap="format">
+            </iron-icon>
+          </a>
+
+          <a class="toolbar__tool" title="Ordered list">
+            <iron-icon
+              class="toolbar__tool__icon"
+              icon="simpla-markdown:format-list-numbered"
+              data-action="toggleOrderedList"
+              on-tap="format">
+            </iron-icon>
           </a>
 
           <div class="toolbar__separator"></div>
 
-          <a class="toolbar__tool"
-            on-tap="format"
-            data-icon="clear"
-            data-action="cleanBlock" title="Clear formatting">
+          <a class="toolbar__tool" title="Insert link">
+            <iron-icon
+              class="toolbar__tool__icon"
+              icon="simpla-markdown:insert-link"
+              data-action="drawLink"
+              on-tap="format">
+            </iron-icon>
+          </a>
+
+          <a class="toolbar__tool" title="Insert image">
+            <iron-icon
+              class="toolbar__tool__icon"
+              icon="simpla-markdown:insert-photo"
+              data-action="drawImage"
+              on-tap="format">
+            </iron-icon>
+          </a>
+
+          <div class="toolbar__separator"></div>
+
+          <a class="toolbar__tool" title="Clear formatting">
+            <iron-icon
+              class="toolbar__tool__icon"
+              icon="simpla-markdown:format-clear"
+              data-action="cleanBlock"
+              on-tap="format">
+            </iron-icon>
           </a>
         </div>
       </template>

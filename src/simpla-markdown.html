@@ -3,13 +3,6 @@
 <dom-module id="simpla-markdown">
   <template>
     <style>
-      :host, *, *::before, *::after {
-        box-sizing: border-box;
-        -moz-osx-font-smoothing: grayscale;
-         -webkit-font-smoothing: antialiased;
-                 font-smoothing: antialiased;
-      }
-
       :host {
         display: block;
         position: relative;
@@ -215,7 +208,6 @@
         link =  document.createElement('link');
         link.rel = 'import';
         link.href = this.resolveUrl(EDITOR_COMPONENT);
-        link.setAttribute('async', '');
         document.head.appendChild(link);
 
         this._editorImported = true;
