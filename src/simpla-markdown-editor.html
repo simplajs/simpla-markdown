@@ -179,6 +179,7 @@
         min-height: 0 !important;
         border: 0 !important;
         padding: 0 !important;
+        color: var(--simpla-text-color) !important;
       }
 
       .CodeMirror-scroll {
@@ -224,6 +225,15 @@
         font-size: 1em !important;
       }
 
+      .cm-link {
+        color: var(--simpla-grey-700) !important;
+        text-decoration: none !important;
+      }
+
+      .cm-url {
+        color: var(--simpla-grey-500) !important;
+      }
+
       /* Patch hidden prop on IE */
       [hidden] {
         display: none !important;
@@ -246,81 +256,97 @@
       <!-- Optional toolbar -->
       <template is="dom-if" if="[[toolbar]]">
         <div class="toolbar">
-          <a class="toolbar__tool" title="Bold">
+          <a class="toolbar__tool"
+            on-tap="format"
+            title="Bold"
+          >
             <iron-icon
               class="toolbar__tool__icon"
               icon="simpla-markdown:format-bold"
-              data-action="toggleBold"
-              on-tap="format">
+              data-action="toggleBold">
             </iron-icon>
           </a>
 
-          <a class="toolbar__tool" title="Italic">
+          <a class="toolbar__tool"
+            on-tap="format"
+            title="Italic"
+          >
             <iron-icon
               class="toolbar__tool__icon"
               icon="simpla-markdown:format-italic"
-              data-action="toggleItalic"
-              on-tap="format">
+              data-action="toggleItalic">
             </iron-icon>
           </a>
 
           <div class="toolbar__separator"></div>
 
-          <a class="toolbar__tool" title="Heading">
+          <a class="toolbar__tool"
+            on-tap="format"
+            title="Heading"
+          >
             <iron-icon
               class="toolbar__tool__icon"
               icon="simpla-markdown:title"
-              data-action="toggleHeadingSmaller"
-              on-tap="format">
+              data-action="toggleHeadingSmaller">
             </iron-icon>
           </a>
 
-          <a class="toolbar__tool" title="Unordered list">
+          <a class="toolbar__tool"
+            on-tap="format"
+            title="Unordered list"
+          >
             <iron-icon
               class="toolbar__tool__icon"
               icon="simpla-markdown:format-list-bulleted"
-              data-action="toggleUnorderedList"
-              on-tap="format">
+              data-action="toggleUnorderedList">
             </iron-icon>
           </a>
 
-          <a class="toolbar__tool" title="Ordered list">
+          <a class="toolbar__tool"
+            on-tap="format"
+            title="Ordered list"
+          >
             <iron-icon
               class="toolbar__tool__icon"
               icon="simpla-markdown:format-list-numbered"
-              data-action="toggleOrderedList"
-              on-tap="format">
+              data-action="toggleOrderedList">
             </iron-icon>
           </a>
 
           <div class="toolbar__separator"></div>
 
-          <a class="toolbar__tool" title="Insert link">
+          <a class="toolbar__tool"
+            on-tap="format"
+            title="Insert link"
+          >
             <iron-icon
               class="toolbar__tool__icon"
               icon="simpla-markdown:insert-link"
-              data-action="drawLink"
-              on-tap="format">
+              data-action="drawLink">
             </iron-icon>
           </a>
 
-          <a class="toolbar__tool" title="Insert image">
+          <a class="toolbar__tool"
+            on-tap="format"
+            title="Insert image"
+          >
             <iron-icon
               class="toolbar__tool__icon"
               icon="simpla-markdown:insert-photo"
-              data-action="drawImage"
-              on-tap="format">
+              data-action="drawImage">
             </iron-icon>
           </a>
 
           <div class="toolbar__separator"></div>
 
-          <a class="toolbar__tool" title="Clear formatting">
+          <a class="toolbar__tool"
+            on-tap="format"
+            title="Clear formatting"
+          >
             <iron-icon
               class="toolbar__tool__icon"
               icon="simpla-markdown:format-clear"
-              data-action="cleanBlock"
-              on-tap="format">
+              data-action="cleanBlock">
             </iron-icon>
           </a>
         </div>
