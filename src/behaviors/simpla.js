@@ -13,8 +13,9 @@ export default {
      * Stored Simpla observers
      * @type {Object}
      */
-    _observers: {
+    _simplaObservers: {
       type: Object,
+      readonly: true,
       value: {}
     }
   },
@@ -24,8 +25,17 @@ export default {
   ],
 
   /**
-   * Setup editable state observer
-   * Called by Polymer on attach
+   * Check for Simpla on element creation
+   * @return {undefined}
+   */
+  created() {
+    if (!window.Simpla) {
+      console.error('Cannot find Simpla global');
+    }
+  },
+
+  /**
+   * Setup editable state observer on attach
    * @return {undefined}
    */
   attached() {
@@ -33,16 +43,17 @@ export default {
   },
 
   /**
-   * Clean up Simpla observers
-   * Called by Polymer on detach
+   * Clean up Simpla observers on detach
    * @return {undefined}
    */
   detached() {
-    Object.keys(this._observers)
+    Object.keys(this._simplaObservers)
       .forEach(observer => {
-        this._observers[observer].unobserve();
+        this._simplaObservers[observer].unobserve();
       });
+    this._simplaObservers = [];
   },
+
 
   /**
    * Init the UID whenever it changes
@@ -50,10 +61,11 @@ export default {
    * @return {undefined}
    */
   _initUid(uid) {
-    // Get data for UID
     Simpla.get(uid)
       .then(item => {
-        this._value = item.data.markdown
+        if (item && item.data) {
+          this._value = item.data.markdown;
+        }
       });
 
     // Setup data observer for future changes
@@ -69,9 +81,7 @@ export default {
   _setData(value, uid) {
     return Simpla.set(uid, {
       type: 'Article',
-      data: {
-        markdown: value
-      }
+      data: { markdown: value }
     });
   },
 
@@ -81,16 +91,17 @@ export default {
    * @return {undefined}
    */
   _observeBuffer(uid) {
+    let observers = this._simplaObservers;
+
     if (!uid) {
       return;
     }
 
-    // Clean up any old observers
-    if (this._observers.buffer) {
-      this._observers.buffer.unobserve();
+    if (observers.buffer) {
+      observers.buffer.unobserve();
     }
 
-    this._observers.buffer = Simpla.observe(uid, item => {
+    observers.buffer = Simpla.observe(uid, item => {
       if (item && item.data) {
         this.value = item.data.markdown;
       }
@@ -102,16 +113,16 @@ export default {
    * @return {undefined}
    */
   _observeEditable() {
-    // Get initial value of editable
+    let observers = this._simplaObservers;
+
     this.editable = Simpla.getState('editable');
 
-    // Clean up any old observers
-    if (this._observers.editable) {
-      this._observers.editable.unobserve();
+    if (observers.editable) {
+      observers.editable.unobserve();
     }
 
-    this._observers.editable = Simpla.observeState('editable', editable => {
-      this.editable = editable
-    });
+    observers.editable = Simpla.observeState('editable',
+      editable => this.editable = editable
+    );
   }
 }
