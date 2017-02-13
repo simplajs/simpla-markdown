@@ -27,11 +27,11 @@
          NPM import resolved with postcss-import */
       @import 'simplemde/dist/simplemde.min.css';
 
-     :host, *, *::before, *::after {
+      /**
+       * Core layout
+       */
+      :host, *, *::before, *::after {
         box-sizing: border-box;
-        -moz-osx-font-smoothing: grayscale;
-         -webkit-font-smoothing: antialiased;
-                 font-smoothing: antialiased;
       }
 
       :host {
@@ -44,15 +44,13 @@
         width: 100%;
         height: 100%;
         z-index: 2147483647;
+        -moz-osx-font-smoothing: grayscale;
+         -webkit-font-smoothing: antialiased;
+                 font-smoothing: antialiased;
       }
 
-      /* Fake display none for transitions */
-      :host(:not([open])) {
-        position: absolute;
-        height: 0;
-        width: 0;
-        visibility: hidden;
-        overflow: hidden;
+      :host([hidden]) {
+        display: none;
       }
 
       .overlay {
@@ -62,16 +60,18 @@
         bottom: 0;
         left: 0;
         background: var(--simpla-light-black);
-        opacity: 0;
         cursor: pointer;
+      }
+
+      :host(:not([visible])) .overlay {
+        opacity: 0;
         transition: opacity 300ms ease;
         transition-delay: 100ms;
       }
 
-      :host([active]) .overlay {
+      :host([visible]) .overlay {
         opacity: 1;
-        transition-delay: 0;
-        transition-duration: 350ms
+        transition: opacity 350ms ease;
       }
 
       .editor {
@@ -87,13 +87,16 @@
         border-radius: var(--simpla-border-radius);
         box-shadow: var(--simpla-elevation-4);
         z-index: 1;
+      }
+
+      :host(:not([visible])) .editor {
         transform: translateY(15%);
         opacity: 0;
         transition: transform 200ms var(--simpla-easing-accelerate),
                     opacity 150ms ease;
       }
 
-      :host([active]) .editor {
+      :host([visible]) .editor {
         transform: translateY(0);
         opacity: 1;
         transition: transform 275ms var(--simpla-easing-decelerate),
@@ -101,6 +104,9 @@
         transition-delay: 200ms;
       }
 
+      /**
+       * Exit button
+       */
       .exit {
         position: absolute;
         display: flex;
@@ -130,6 +136,9 @@
         --iron-icon-height: var(--simpla-scale-0);
       }
 
+      /**
+       * Custom toolbar
+       */
       .toolbar {
         display: flex;
         margin: 0.5em 0 2em;
@@ -168,7 +177,9 @@
         margin: 0 0.8em;
       }
 
-      /* Vendor overwrites */
+      /**
+       * Editor (vendor overwrites)
+       */
       .CodeMirror,
       .CodeMirror-scroll {
         min-height: 0 !important;
@@ -242,7 +253,7 @@
 
     <div class="overlay"
       on-tap="exit"
-      on-transitionend="_closeOnInactive">
+      on-transitionend="_hideOnInactive">
     </div>
 
     <div class="editor">
@@ -253,7 +264,7 @@
         </iron-icon>
       </a>
 
-      <!-- Optional toolbar -->
+      <!-- Custom toolbar -->
       <template is="dom-if" if="[[toolbar]]">
         <div class="toolbar">
           <a class="toolbar__tool"
@@ -394,33 +405,44 @@
         this.properties = {
 
           /**
+           * State of the editor
+           * @type {Boolean}
+           */
+          active: {
+            type: Boolean,
+            notify: true
+          },
+
+          /**
+           * Whether editor is visible
+           * Used for CSS transitions
+           * @type {Boolean}
+           */
+          visible: {
+            type: Boolean,
+            reflectToAttribute: true,
+            readonly: true,
+            value: false
+          },
+
+           /**
+           * Whether editor is hidden
+           * Used for CSS transitions
+           * @type {Boolean}
+           */
+          hidden: {
+            type: Boolean,
+            reflectToAttribute: true,
+            readonly: true,
+            value: true
+          },
+
+          /**
            * Markdown source
            * @type {String}
            */
           value: {
             type: String,
-            notify: true
-          },
-
-          /**
-           * Whether the editor is active
-           * @type {Boolean}
-           */
-          active: {
-            type: Boolean,
-            observer: '_activeChanged',
-            reflectToAttribute: true,
-            notify: true
-          },
-
-          /**
-           * Whether the editor is visibly open
-           * Used for transitions
-           * @type {Boolean}
-           */
-          open: {
-            type: Boolean,
-            reflectToAttribute: true,
             notify: true
           },
 
@@ -444,14 +466,20 @@
 
         };
 
+        this.observers = [
+          '_toggleVisibility(active)',
+          '_toggleBodyLock(active)',
+          '_focusEditor(active)',
+          '_syncValue(active)'
+        ]
+
         this.listeners = {
-          'keydown': '_exitOnHotkeys'
-        }
+          keydown: '_exitOnHotkeys'
+        };
       }
 
       /**
-       * Init SimpleMDE editor
-       * Called by Polymer on element attach
+       * Init SimpleMDE editor on attach
        * @return {undefined}
        */
       attached() {
@@ -473,23 +501,6 @@
       }
 
       /**
-       * Observer for the active property
-       * @param  {Boolean} active Current state of active prop
-       * @return {undefined}
-       */
-      _activeChanged(active) {
-        if (active) {
-          this.open = true;
-          this._toggleBodyLock(true);
-          this._focusEditor();
-          this._syncValue('in');
-        } else {
-          this._toggleBodyLock(false);
-          this._syncValue('out');
-        }
-      }
-
-      /**
        * Formatter function
        * Calls action (from event target) on SimpleMDE
        * @param  {Event} e Tap event
@@ -497,57 +508,76 @@
        */
       format(e) {
         let action = Polymer.dom(e).rootTarget.dataset.action;
-
         this._editor[action]();
       }
 
       /**
-       * Utility function to set active false
+       * Sets active false
+       * Used by tap handlers
        * @return {undefined}
        */
       exit() {
         this.active = false;
       }
 
-      /**
-       * Toggles locked document body scrolling
-       * @param {Boolean} state whether to lock or unlock body
-       * @return {undefined}
-       */
-      _toggleBodyLock(state) {
-        document.body.style.overflow = state ? 'hidden' : '';
-      }
+      _toggleVisibility(active) {
+        if (active) {
+          this.hidden = false;
 
-      /**
-       * Gives editor focus at the beginning of the document
-       * @return {undefined}
-       */
-      _focusEditor() {
-        this._editor.codemirror.focus();
-        this._editor.codemirror.execCommand('goDocStart');
-      }
-
-      /**
-       * Manually bind the value property in and out of the editor
-       * @param  {String} direction in|out Direction to sync the value
-       * @return {undefined}
-       */
-      _syncValue(direction) {
-        switch (direction) {
-        case 'in':
-          this._editor.value(this.value);
-          break;
-        case 'out':
-          this.value = this._editor.value()
-          break;
-        default:
-          console.warn(direction, 'is not a valid argument');
+          Polymer.RenderStatus
+            .afterNextRender(this, () => this.visible = true);
+        } else {
+          this.visible = false;
         }
       }
 
       /**
-       * Exit (and 'save') the editor on certain hotkeys
-       * Bound to keydown events with Polymer
+       * Hides the editor after close transitions
+       * @param  {Event} e Transitionend event
+       * @return {undefined}
+       */
+      _hideOnInactive(e) {
+        if (!this.active) {
+          this.hidden = true;
+        }
+      }
+
+      /**
+       * Autofocus the editor when active
+       * @param {Boolean} active Value of the active property
+       * @return {undefined}
+       */
+      _focusEditor(active) {
+        if (active) {
+          this._editor.codemirror.focus();
+          this._editor.codemirror.execCommand('goDocStart');
+        }
+      }
+
+      /**
+       * Sync the markdown value in and out of the editor on active change
+       * @param  {Boolean} active Value of the active property
+       * @return {undefined}
+       */
+      _syncValue(active) {
+        if (active) {
+          this._editor.value(this.value);
+        } else {
+          this.value = this._editor.value()
+        }
+      }
+
+      /**
+       * Disable body scolling while editor is active
+       * @param {Boolean} active Value of the active property
+       * @return {undefined}
+       */
+      _toggleBodyLock(active) {
+        document.body.style.overflow = active ? 'hidden' : '';
+      }
+
+      /**
+       * Exit the editor on certain hotkeys
        * @param  {Event} e Keydown event on host
        * @return {undefined}
        */
@@ -557,17 +587,6 @@
 
         if (cmdEnter || escape) {
           this.active = false;
-        }
-      }
-
-      /**
-       * Set open to false at end of closing CSS transition
-       * @param  {Event} e Transitionend event from DOM
-       * @return {undefined}
-       */
-      _closeOnInactive(e) {
-        if (!this.active) {
-          this.open = false;
         }
       }
     }
