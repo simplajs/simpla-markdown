@@ -63,9 +63,7 @@ export default {
   _initUid(uid) {
     Simpla.get(uid)
       .then(item => {
-        if (item && item.data) {
-          this._value = item.data.markdown;
-        }
+        this._value = item && item.data ? item.data.markdown : ''
       });
 
     // Setup data observer for future changes
@@ -102,9 +100,7 @@ export default {
     }
 
     observers.buffer = Simpla.observe(uid, item => {
-      if (item && item.data) {
-        this.value = item.data.markdown;
-      }
+      this.value = item && item.data ? item.data.markdown : '';
     });
   },
 
