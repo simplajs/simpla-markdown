@@ -81,7 +81,10 @@
     import MarkdownIt from 'markdown-it';
     import simpla from './behaviors/simpla';
 
-    const EDITOR_COMPONENT = 'simpla-markdown-editor.html';
+    const EDITOR_COMPONENT = 'simpla-markdown-editor.html',
+          MARKDOWN_OPTS = {
+            typographer: true
+          };
 
     class SimplaMarkdown {
       beforeRegister() {
@@ -174,6 +177,10 @@
           _parser: Object
 
         };
+
+        this.observers = [
+          '_setMarkdownOpts(allowHtml, linkify)'
+        ]
       }
 
       get behaviors() {
@@ -186,10 +193,13 @@
        * @return {undefined}
        */
       created() {
-        this._parser = new MarkdownIt({
-          html: this.allowHtml,
-          linkify: this.linkify,
-          typographer: true
+        this._parser = new MarkdownIt(MARKDOWN_OPTS);
+      }
+
+      _setMarkdownOpts(allowHtml, linkify) {
+        this._parser && this._parser.set({
+          html: allowHtml,
+          linkify: linkify
         });
       }
 
