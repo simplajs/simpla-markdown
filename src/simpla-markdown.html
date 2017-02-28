@@ -229,7 +229,8 @@
        * @return {undefined}
        */
       _render(value) {
-        Polymer.dom(this).innerHTML = this._parser.render(value)
+        Polymer.dom(this).innerHTML = this._parser.render(value);
+        this.fire('render');
       }
 
       /**
