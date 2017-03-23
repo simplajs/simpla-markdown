@@ -13,15 +13,16 @@
       window.Polymer = { dom: 'shadow' };
     </script>
 
-    <!-- Init Simpla -->
+    <!-- Include Simpla -->
     <script src="../../simpla/simpla.js"></script>
     <script>
-      Simpla.init('S1OAwHrr');
+      Simpla.init('dummy')
     </script>
 
     <!-- Import component -->
     <link rel="import" href="../simpla-markdown.html">
 
+    <!-- Give content some basic styles -->
     <style>
       simpla-markdown {
         font-family: sans-serif;
@@ -44,9 +45,15 @@
     </style>
 
   </head>
-  <body unresolved>
+  <body>
+    <button id="edit-mode">toggle edit mode</button>
 
-    <simpla-markdown uid="simpla-markdown"></simpla-markdown>
+    <simpla-markdown uid="dummy"></simpla-markdown>
 
+    <script>
+      document.querySelector('#edit-mode').addEventListener('click', function() {
+        Simpla.editable(!Simpla.getState('editable'));
+      });
+    </script>
   </body>
 </html>
