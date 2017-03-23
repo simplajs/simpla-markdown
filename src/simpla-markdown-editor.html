@@ -45,6 +45,7 @@
         height: 100%;
         font-size: var(--simpla-scale-0);
         z-index: var(--simpla-on-top);
+        outline: none;
         -moz-osx-font-smoothing: grayscale;
          -webkit-font-smoothing: antialiased;
                  font-smoothing: antialiased;
@@ -54,33 +55,12 @@
         max-width: 100vw;
       }
 
-      .overlay {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        background: var(--simpla-light-black);
-        cursor: pointer;
-      }
-
-      :host(:not([visible])) .overlay {
-        opacity: 0;
-        transition: opacity 300ms ease;
-        transition-delay: 100ms;
-      }
-
-      :host([visible]) .overlay {
-        opacity: 1;
-        transition: opacity 350ms ease;
-      }
-
       .editor {
         display: flex;
         flex-direction: column;
-        height: 90%;
-        width: 90%;
         background: white;
+        width: 90%;
+        height: 90%;
         font-family: var(--simpla-font-family);
         font-size: var(--simpla-scale-1);
         line-height: 1.6;
@@ -89,6 +69,7 @@
         box-shadow: var(--simpla-elevation-4);
         z-index: 1;
         user-select: none;
+        outline: none;
       }
 
       :host(:not([visible])) .editor {
@@ -253,12 +234,9 @@
       }
     </style>
 
-    <div class="overlay"
-      on-tap="exit"
-      on-transitionend="_hideOnInactive">
-    </div>
-
-    <div class="editor">
+    <div class="editor"
+      on-transitionend="_hideOnInactive"
+    >
 
       <a class="exit" on-tap="exit">
         <iron-icon class="exit__icon"
@@ -454,6 +432,16 @@
           toolbar: Boolean,
 
           /**
+           * Make editor component focuseable
+           * @type {Number}
+           */
+          tabindex: {
+            type: Number,
+            value: 0,
+            reflectToAttribute: true
+          },
+
+          /**
            * Current value of the editor
            * @type {String}
            */
@@ -475,7 +463,9 @@
         ]
 
         this.listeners = {
-          keydown: '_exitOnHotkeys'
+          keydown: '_exitOnHotkeys',
+          tap: '_exitOnOutsideTap',
+          blur: 'exit'
         };
       }
 
@@ -587,6 +577,12 @@
        */
       _toggleBodyLock(active) {
         document.body.style.overflow = active ? 'hidden' : '';
+      }
+
+      _exitOnOutsideTap(e) {
+        if (Polymer.dom(e).rootTarget === this) {
+          this.active = false;
+        }
       }
 
       /**
