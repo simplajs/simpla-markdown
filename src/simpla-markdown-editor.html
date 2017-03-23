@@ -43,14 +43,15 @@
         justify-content: center;
         width: 100%;
         height: 100%;
-        z-index: 2147483647;
+        font-size: var(--simpla-scale-0);
+        z-index: var(--simpla-on-top);
         -moz-osx-font-smoothing: grayscale;
          -webkit-font-smoothing: antialiased;
                  font-smoothing: antialiased;
-      }
 
-      :host([hidden]) {
-        display: none;
+        /* Account for transformed parents */
+        max-height: 100vh;
+        max-width: 100vw;
       }
 
       .overlay {
@@ -83,7 +84,7 @@
         font-family: var(--simpla-font-family);
         font-size: var(--simpla-scale-1);
         line-height: 1.6;
-        padding: var(--simpla-scale-1) var(--simpla-scale-3);
+        padding: 1.5em 3em;
         border-radius: var(--simpla-border-radius);
         box-shadow: var(--simpla-elevation-4);
         z-index: 1;
@@ -245,8 +246,8 @@
         color: var(--simpla-grey-500) !important;
       }
 
-      /* Patch hidden prop on IE */
-      [hidden] {
+      /* Patch hidden prop on Chrome & IE */
+      :host([hidden]), *[hidden] {
         display: none !important;
       }
     </style>
@@ -433,7 +434,6 @@
           hidden: {
             type: Boolean,
             reflectToAttribute: true,
-            readonly: true,
             value: true
           },
 
@@ -470,7 +470,7 @@
           '_toggleVisibility(active)',
           '_toggleBodyLock(active)',
           '_focusEditor(active)',
-          '_syncValue(active)'
+          '_populateEditor(active)'
         ]
 
         this.listeners = {
@@ -495,7 +495,7 @@
           ],
         }, SIMPLEMDE_CONFIG));
 
-        editor.codemirror.on('change', () => this._currentValue = editor.value());
+        editor.codemirror.on('change', () => this._syncValue('out'));
 
         this._editor = editor;
       }
@@ -520,6 +520,12 @@
         this.active = false;
       }
 
+      /**
+       * Set visibility based on active state
+       * Allows pure CSS transitions
+       * @param  {Boolean} active Value of the active property
+       * @return {undefined}
+       */
       _toggleVisibility(active) {
         if (active) {
           this.hidden = false;
@@ -554,13 +560,19 @@
         }
       }
 
+      _populateEditor(active) {
+        if (active) {
+          this._syncValue('in');
+        }
+      }
+
       /**
        * Sync the markdown value in and out of the editor on active change
-       * @param  {Boolean} active Value of the active property
+       * @param  {String} direction What to sync value to
        * @return {undefined}
        */
-      _syncValue(active) {
-        if (active) {
+      _syncValue(direction) {
+        if (direction === 'in') {
           this._editor.value(this.value);
         } else {
           this.value = this._editor.value()

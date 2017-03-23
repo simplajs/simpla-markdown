@@ -25,20 +25,11 @@ export default {
   ],
 
   /**
-   * Check for Simpla on element creation
-   * @return {undefined}
-   */
-  created() {
-    if (!window.Simpla) {
-      console.error('Cannot find Simpla global');
-    }
-  },
-
-  /**
-   * Setup editable state observer on attach
+   * Check Simpla is ready and setup editable state observer on attach
    * @return {undefined}
    */
   attached() {
+    this._checkSimpla();
     this._observeEditable();
   },
 
@@ -54,6 +45,17 @@ export default {
     this._simplaObservers = [];
   },
 
+  _checkSimpla() {
+    if (!window.Simpla) {
+      console.error('Cannot find Simpla global');
+      return false;
+    }
+
+    if (!window.Simpla.getState('config').project) {
+      console.error('You must initialise a Simpla project before using simpla-markdown')
+      return false;
+    }
+  },
 
   /**
    * Init the UID whenever it changes

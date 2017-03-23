@@ -50,10 +50,10 @@
 
     <!-- Editor imported on editable true -->
     <simpla-markdown-editor
+      id="editor"
       value="{{_value}}"
       active="{{active}}"
-      toolbar="[[!hideToolbar]]"
-      hidden$="[[!editable]]">
+      toolbar="[[!hideToolbar]]">
     </simpla-markdown-editor>
 
     <div class="content" data-editing$="[[active]]">
@@ -98,7 +98,6 @@
            */
           value: {
             type: String,
-            observer: '_render',
             notify: true
           },
 
@@ -114,7 +113,6 @@
            */
           editable: {
             type: Boolean,
-            observer: '_importEditor',
             reflectToAttribute: true,
             notify: true
           },
@@ -179,7 +177,10 @@
         };
 
         this.observers = [
-          '_setMarkdownOpts(allowHtml, linkify)'
+          '_render(value, active)',
+          '_setMarkdownOpts(allowHtml, linkify)',
+          '_importEditor(editable)',
+          '_ensureEditorInactiveWhenNotEditable(editable)'
         ]
       }
 
@@ -196,6 +197,12 @@
         this._parser = new MarkdownIt(MARKDOWN_OPTS);
       }
 
+      /**
+       * Set options on MarkdownIt dynamically
+       * @param {Boolean} allowHtml Value of allowHtml prop
+       * @param {Boolean} linkify   Value of linkfy prop
+       * @return {undefined}
+       */
       _setMarkdownOpts(allowHtml, linkify) {
         this._parser && this._parser.set({
           html: allowHtml,
@@ -224,11 +231,28 @@
       }
 
       /**
-       * Renders markdown source to innerHTML (Light DOM)
-       * @param  {String} value Markdown source to render
+       * Set editor active false when editable is fale
+       * @param  {Boolean} editable Whether element is editable
        * @return {undefined}
        */
-      _render(value) {
+      _ensureEditorInactiveWhenNotEditable(editable) {
+        if (!editable) {
+          this.$.editor.active = false;
+        }
+      }
+
+      /**
+       * Render markdown source to innerHTML (Light DOM)
+       * @param  {String} value   Markdown source to render
+       * @param  {Boolean} active Whether editor is open
+       * @return {undefined}
+       */
+      _render(value, active) {
+        // Don't render while the editor is open
+        if (active) {
+          return;
+        }
+
         Polymer.dom(this).innerHTML = this._parser.render(value);
         this.fire('render');
       }
