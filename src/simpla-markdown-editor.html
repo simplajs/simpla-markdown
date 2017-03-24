@@ -20,6 +20,11 @@
   </svg>
 </iron-iconset-svg>
 
+<!-- For Shady - BOOO HISSS -->
+<style>
+  @import 'simplemde/dist/simplemde.min.css';
+</style>
+
 <dom-module id="simpla-markdown-editor">
   <template>
     <style>
@@ -180,11 +185,6 @@
         min-height: 0 !important;
       }
 
-      /* SHADY CSS HACK */
-      .CodeMirror pre:not(.CodeMirror-line) {
-        display: none !important;
-      }
-
       .editor-statusbar {
         font-size: var(--simpla-scale-00) !important;
         color: var(--simpla-grey-500) !important;
@@ -198,6 +198,10 @@
         content: ' words';
       }
 
+      /*
+        Content overrides
+        These will NOT be applied to shady
+      */
       .cm-header {
         line-height: 1.3 !important;
       }
