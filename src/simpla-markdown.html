@@ -72,7 +72,7 @@
       </template>
 
       <!-- Rendered content (Light DOM) -->
-      <content></content>
+      <slot></slot>
 
     </div>
   </template>
@@ -86,116 +86,111 @@
             typographer: true
           };
 
-    class SimplaMarkdown {
-      beforeRegister() {
-        this.is = 'simpla-markdown';
+    Polymer({
+      is: 'simpla-markdown',
 
-        this.properties = {
+      properties: {
 
-          /**
-           * Markdown source (fetched from Simpla)
-           * @type {String}
-           */
-          value: {
-            type: String,
-            notify: true
-          },
+        /**
+         * Markdown source (fetched from Simpla)
+         * @type {String}
+         */
+        value: {
+          type: String,
+          notify: true
+        },
 
-          /**
-           * Internal markdown source (set to Simpla)
-           * @type {String}
-           */
-          _value: String,
+        /**
+         * Internal markdown source (set to Simpla)
+         * @type {String}
+         */
+        _value: String,
 
-          /**
-           * Whether element is editable
-           * @type {Boolean}
-           */
-          editable: {
-            type: Boolean,
-            reflectToAttribute: true,
-            notify: true
-          },
+        /**
+         * Whether element is editable
+         * @type {Boolean}
+         */
+        editable: {
+          type: Boolean,
+          reflectToAttribute: true,
+          notify: true
+        },
 
-          /**
-           * Whether editor is open
-           * @type {Boolean}
-           */
-          active: {
-            type: Boolean,
-            notify: true
-          },
+        /**
+         * Whether editor is open
+         * @type {Boolean}
+         */
+        active: {
+          type: Boolean,
+          notify: true
+        },
 
-          /**
-           * Placeholder to show if editable and no content
-           * @type {String}
-           */
-          placeholder: {
-            type: String,
-            value: 'Tap to start writing...'
-          },
+        /**
+         * Placeholder to show if editable and no content
+         * @type {String}
+         */
+        placeholder: {
+          type: String,
+          value: 'Tap to start writing...'
+        },
 
-          /**
-           * Render HTML in source markdown
-           * @type {Boolean}
-           */
-          allowHtml: {
-            type: Boolean,
-            value: false
-          },
+        /**
+         * Render HTML in source markdown
+         * @type {Boolean}
+         */
+        allowHtml: {
+          type: Boolean,
+          value: false
+        },
 
-          /**
-           * Automatically render URLs as anchors
-           * @type {Boolean}
-           */
-          linkify: {
-            type: Boolean,
-            value: false
-          },
+        /**
+         * Automatically render URLs as anchors
+         * @type {Boolean}
+         */
+        linkify: {
+          type: Boolean,
+          value: false
+        },
 
-          /**
-           * Hide the toolbar
-           * @type {Object}
-           */
-          hideToolbar: {
-            type: Boolean,
-            value: false
-          },
+        /**
+         * Hide the toolbar
+         * @type {Object}
+         */
+        hideToolbar: {
+          type: Boolean,
+          value: false
+        },
 
-          /**
-           * Whether editor component has been imported
-           * @type {Boolean}
-           */
-          _editorImported: Boolean,
+        /**
+         * Whether editor component has been imported
+         * @type {Boolean}
+         */
+        _editorImported: Boolean,
 
-          /**
-           * Markdown-it instance
-           * @type {Object}
-           */
-          _parser: Object
+        /**
+         * Markdown-it instance
+         * @type {Object}
+         */
+        _parser: Object
+      },
 
-        };
+      observers: [
+        '_render(value, active)',
+        '_setMarkdownOpts(allowHtml, linkify)',
+        '_importEditor(editable)',
+        '_ensureEditorInactiveWhenNotEditable(editable)'
+      ],
 
-        this.observers = [
-          '_render(value, active)',
-          '_setMarkdownOpts(allowHtml, linkify)',
-          '_importEditor(editable)',
-          '_ensureEditorInactiveWhenNotEditable(editable)'
-        ]
-      }
-
-      get behaviors() {
-        return [ simpla ];
-      }
+      behaviors: [ simpla ],
 
       /**
        * Initialises markdown-it instance
        * Called by Polymer on element creation
        * @return {undefined}
        */
-      created() {
+      created: function() {
         this._parser = new MarkdownIt(MARKDOWN_OPTS);
-      }
+      },
 
       /**
        * Set options on MarkdownIt dynamically
@@ -203,19 +198,19 @@
        * @param {Boolean} linkify   Value of linkfy prop
        * @return {undefined}
        */
-      _setMarkdownOpts(allowHtml, linkify) {
+      _setMarkdownOpts: function(allowHtml, linkify) {
         this._parser && this._parser.set({
           html: allowHtml,
           linkify: linkify
         });
-      }
+      },
 
       /**
        * Imports editor component when editable true
        * @param  {Boolean} editable Current value of the editable property
        * @return {undefined}
        */
-      _importEditor(editable) {
+      _importEditor: function(editable) {
         let link;
 
         if (!editable || this._editorImported) {
@@ -228,18 +223,18 @@
         document.head.appendChild(link);
 
         this._editorImported = true;
-      }
+      },
 
       /**
        * Set editor active false when editable is fale
        * @param  {Boolean} editable Whether element is editable
        * @return {undefined}
        */
-      _ensureEditorInactiveWhenNotEditable(editable) {
+      _ensureEditorInactiveWhenNotEditable: function(editable) {
         if (!editable) {
           this.$.editor.active = false;
         }
-      }
+      },
 
       /**
        * Render markdown source to innerHTML (Light DOM)
@@ -247,7 +242,7 @@
        * @param  {Boolean} active Whether editor is open
        * @return {undefined}
        */
-      _render(value, active) {
+      _render: function(value, active) {
         // Don't render while the editor is open
         if (active) {
           return;
@@ -255,25 +250,24 @@
 
         Polymer.dom(this).innerHTML = this._parser.render(value);
         this.fire('render');
-      }
+      },
 
       /**
        * Utility function to set active true
        * @return {undefined}
        */
-      _goActive() {
+      _goActive: function() {
         this.active = true;
-      }
+      },
 
       /**
        * Utilty function to check if value has content
        * @param  {String}  value Value property
        * @return {Boolean}       Coerced Boolean of value property
        */
-      _hasContent(value) {
+      _hasContent: function(value) {
         return !!value.trim();
       }
-    }
-    Polymer(SimplaMarkdown);
+    });
   </script>
 </dom-module>

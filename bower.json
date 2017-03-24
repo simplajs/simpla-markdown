@@ -19,14 +19,18 @@
     "!LICENSE"
   ],
   "dependencies": {
-    "polymer": "^1.6.0",
+    "polymer": "Polymer/polymer#2.0.0-rc.3",
     "simpla-styles": "^0.5.0",
-    "iron-icon": "PolymerElements/iron-icon#^1.0.12",
-    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^1.1.0"
+    "iron-icon": "PolymerElements/iron-icon#2.0-preview",
+    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#2.0-preview"
   },
   "devDependencies": {
-    "webcomponentsjs": "^0.7.14",
     "web-component-tester": "^5.0.0",
     "simpla": "simplaio/simpla#2.0-preview"
+  },
+  "resolutions": {
+    "polymer": "2.0.0-rc.3",
+    "iron-flex-layout": "2.0-preview",
+    "webcomponentsjs": "^v1.0.0-rc.5"
   }
 }

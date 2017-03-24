@@ -43,7 +43,6 @@
         justify-content: center;
         width: 100%;
         height: 100%;
-        font-size: var(--simpla-scale-0);
         z-index: var(--simpla-on-top);
         outline: none;
         -moz-osx-font-smoothing: grayscale;
@@ -179,6 +178,11 @@
       .CodeMirror-scroll {
         height: 100% !important;
         min-height: 0 !important;
+      }
+
+      /* SHADY CSS HACK */
+      .CodeMirror pre:not(.CodeMirror-line) {
+        display: none !important;
       }
 
       .editor-statusbar {
@@ -378,102 +382,88 @@
       }
     };
 
-    class SimplaMarkdownEditor {
-      beforeRegister() {
-        this.is = 'simpla-markdown-editor';
+    Polymer({
+      is: 'simpla-markdown-editor',
+      properties: {
 
-        this.properties = {
+        /**
+         * State of the editor
+         * @type {Boolean}
+         */
+        active: {
+          type: Boolean,
+          notify: true
+        },
 
-          /**
-           * State of the editor
-           * @type {Boolean}
-           */
-          active: {
-            type: Boolean,
-            notify: true
-          },
+        /**
+         * Whether editor is visible
+         * Used for CSS transitions
+         * @type {Boolean}
+         */
+        visible: {
+          type: Boolean,
+          reflectToAttribute: true,
+          readonly: true,
+          value: false
+        },
 
-          /**
-           * Whether editor is visible
-           * Used for CSS transitions
-           * @type {Boolean}
-           */
-          visible: {
-            type: Boolean,
-            reflectToAttribute: true,
-            readonly: true,
-            value: false
-          },
+         /**
+         * Whether editor is hidden
+         * Used for CSS transitions
+         * @type {Boolean}
+         */
+        hidden: {
+          type: Boolean,
+          reflectToAttribute: true,
+          value: true
+        },
 
-           /**
-           * Whether editor is hidden
-           * Used for CSS transitions
-           * @type {Boolean}
-           */
-          hidden: {
-            type: Boolean,
-            reflectToAttribute: true,
-            value: true
-          },
+        /**
+         * Markdown source
+         * @type {String}
+         */
+        value: {
+          type: String,
+          notify: true
+        },
 
-          /**
-           * Markdown source
-           * @type {String}
-           */
-          value: {
-            type: String,
-            notify: true
-          },
+        /**
+         * Whether to show the toolbar
+         * @type {Boolean}
+         */
+        toolbar: Boolean,
 
-          /**
-           * Whether to show the toolbar
-           * @type {Boolean}
-           */
-          toolbar: Boolean,
+        /**
+         * Current value of the editor
+         * @type {String}
+         */
+        _currentValue: String,
 
-          /**
-           * Make editor component focuseable
-           * @type {Number}
-           */
-          tabindex: {
-            type: Number,
-            value: 0,
-            reflectToAttribute: true
-          },
+        /**
+         * SimpleMDE instance
+         * @type {Object}
+         */
+        _editor: Object
 
-          /**
-           * Current value of the editor
-           * @type {String}
-           */
-          _currentValue: String,
+      },
 
-          /**
-           * SimpleMDE instance
-           * @type {Object}
-           */
-          _editor: Object
+      observers: [
+        '_toggleVisibility(active)',
+        '_toggleBodyLock(active)',
+        '_focusEditor(active)',
+        '_populateEditor(active)'
+      ],
 
-        };
-
-        this.observers = [
-          '_toggleVisibility(active)',
-          '_toggleBodyLock(active)',
-          '_focusEditor(active)',
-          '_populateEditor(active)'
-        ]
-
-        this.listeners = {
-          keydown: '_exitOnHotkeys',
-          tap: '_exitOnOutsideTap',
-          blur: 'exit'
-        };
-      }
+      listeners: {
+        keydown: '_exitOnHotkeys',
+        tap: '_exitOnOutsideTap'
+      },
 
       /**
        * Init SimpleMDE editor on attach
        * @return {undefined}
        */
-      attached() {
+      attached: function() {
         let editor = new SimpleMde(Object.assign({
           element: this.$['editor'],
           status: [
@@ -489,7 +479,7 @@
         editor.codemirror.on('change', () => this._syncValue('out'));
 
         this._editor = editor;
-      }
+      },
 
       /**
        * Formatter function
@@ -497,19 +487,19 @@
        * @param  {Event} e Tap event
        * @return {undefined}
        */
-      format(e) {
+      format: function(e) {
         let action = Polymer.dom(e).rootTarget.dataset.action;
         this._editor[action]();
-      }
+      },
 
       /**
        * Sets active false
        * Used by tap handlers
        * @return {undefined}
        */
-      exit() {
+      exit: function() {
         this.active = false;
-      }
+      },
 
       /**
        * Set visibility based on active state
@@ -517,7 +507,7 @@
        * @param  {Boolean} active Value of the active property
        * @return {undefined}
        */
-      _toggleVisibility(active) {
+      _toggleVisibility: function(active) {
         if (active) {
           this.hidden = false;
 
@@ -526,71 +516,76 @@
         } else {
           this.visible = false;
         }
-      }
+      },
 
       /**
        * Hides the editor after close transitions
        * @param  {Event} e Transitionend event
        * @return {undefined}
        */
-      _hideOnInactive(e) {
+      _hideOnInactive: function(e) {
         if (!this.active) {
           this.hidden = true;
         }
-      }
+      },
 
       /**
        * Autofocus the editor when active
        * @param {Boolean} active Value of the active property
        * @return {undefined}
        */
-      _focusEditor(active) {
+      _focusEditor: function(active) {
         if (active) {
           this._editor.codemirror.focus();
           this._editor.codemirror.execCommand('goDocStart');
         }
-      }
+      },
 
-      _populateEditor(active) {
+      _populateEditor: function(active) {
         if (active) {
           this._syncValue('in');
         }
-      }
+      },
 
       /**
        * Sync the markdown value in and out of the editor on active change
        * @param  {String} direction What to sync value to
        * @return {undefined}
        */
-      _syncValue(direction) {
+      _syncValue: function(direction) {
         if (direction === 'in') {
           this._editor.value(this.value);
         } else {
           this.value = this._editor.value()
         }
-      }
+      },
 
       /**
        * Disable body scolling while editor is active
        * @param {Boolean} active Value of the active property
        * @return {undefined}
        */
-      _toggleBodyLock(active) {
+      _toggleBodyLock: function(active) {
         document.body.style.overflow = active ? 'hidden' : '';
-      }
+      },
 
-      _exitOnOutsideTap(e) {
+      /**
+       * Exit when click outside the editor
+       * @param  {CustomEvent} e Tap event
+       * @return {undefined}
+       */
+      _exitOnOutsideTap: function(e) {
         if (Polymer.dom(e).rootTarget === this) {
           this.active = false;
         }
-      }
+      },
 
       /**
        * Exit the editor on certain hotkeys
        * @param  {Event} e Keydown event on host
        * @return {undefined}
        */
-      _exitOnHotkeys(e) {
+      _exitOnHotkeys: function(e) {
         let cmdEnter = e.keyCode === 13 && e.metaKey,
             escape = e.keyCode === 27;
 
@@ -598,7 +593,6 @@
           this.active = false;
         }
       }
-    }
-    Polymer(SimplaMarkdownEditor);
+    });
   </script>
 </dom-module>
