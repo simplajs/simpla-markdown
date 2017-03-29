@@ -1,12 +1,12 @@
 export default {
   properties: {
     /**
-     * Simpla data ID
+     * Simpla data path
      * @type {String}
      */
-    uid: {
+    path: {
       type: String,
-      observer: '_initUid'
+      observer: '_initPath'
     },
 
     /**
@@ -21,7 +21,7 @@ export default {
   },
 
   observers: [
-    '_setData(_value, uid)'
+    '_setData(_value, path)'
   ],
 
   /**
@@ -58,28 +58,28 @@ export default {
   },
 
   /**
-   * Init the UID whenever it changes
-   * @param  {String} uid Current value of UID prop
+   * Init the data / buffer observer whenever path changes
+   * @param  {String} path Current value of path prop
    * @return {undefined}
    */
-  _initUid(uid) {
-    Simpla.get(uid)
+  _initPath(path) {
+    Simpla.get(path)
       .then(item => {
         this._value = item && item.data ? item.data.markdown : ''
       });
 
     // Setup data observer for future changes
-    this._observeBuffer(uid);
+    this._observeBuffer(path);
   },
 
   /**
    * Set internal value to Simpla on change
    * @param {String} value Internal markdown source
-   * @param {String} uid   Element UID
+   * @param {String} path  Element path
    * @return {Promise}
    */
-  _setData(value, uid) {
-    return Simpla.set(uid, {
+  _setData(value, path) {
+    return Simpla.set(path, {
       type: 'Article',
       data: { markdown: value }
     });
@@ -87,13 +87,13 @@ export default {
 
   /**
    * Data buffer observer
-   * @param  {String} uid UID to observe in buffer
+   * @param  {String} path path to observe in buffer
    * @return {undefined}
    */
-  _observeBuffer(uid) {
+  _observeBuffer(path) {
     let observers = this._simplaObservers;
 
-    if (!uid) {
+    if (!path) {
       return;
     }
 
@@ -101,7 +101,7 @@ export default {
       observers.buffer.unobserve();
     }
 
-    observers.buffer = Simpla.observe(uid, item => {
+    observers.buffer = Simpla.observe(path, item => {
       this.value = item && item.data ? item.data.markdown : '';
     });
   },
