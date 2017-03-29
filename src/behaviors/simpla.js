@@ -16,7 +16,7 @@ export default {
     _simplaObservers: {
       type: Object,
       readonly: true,
-      value: {}
+      value: () => ({})
     }
   },
 
