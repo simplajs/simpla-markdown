@@ -250,6 +250,10 @@
         }
 
         Polymer.dom(this).innerHTML = this._parser.render(value);
+
+        // Ensure element's innerHTML is updated before firing render
+        Polymer.dom.flush();
+
         this.fire('render');
       },
 
