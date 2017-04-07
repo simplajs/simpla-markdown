@@ -6,6 +6,8 @@
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
 
+    <script src="../../simpla/simpla.js"></script>
+
     <!-- Import the element to test -->
     <link rel="import" href="../simpla-markdown.html">
 
@@ -28,6 +30,15 @@
           expect(component).to.be.ok;
         });
 
+        describe('simpla connector', function() {
+          it('should not throw an error when setting the path prop', function() {
+            var setBadPath = function() {
+              component.path = 'bad path';
+            }
+
+            expect(setBadPath).to.not.throw();
+          });
+        });
       });
     </script>
   </body>
