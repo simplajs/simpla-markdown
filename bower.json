@@ -20,13 +20,12 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#2.0.0-rc.3",
-    "simpla-styles": "^0.5.0",
+    "simpla-styles": "^1.0.0",
     "iron-icon": "PolymerElements/iron-icon#2.0-preview",
     "iron-iconset-svg": "PolymerElements/iron-iconset-svg#2.0-preview"
   },
   "devDependencies": {
-    "web-component-tester": "^5.0.0",
-    "simpla": "simplaio/simpla#2.0-preview"
+    "web-component-tester": "^5.0.0"
   },
   "resolutions": {
     "polymer": "2.0.0-rc.3",
