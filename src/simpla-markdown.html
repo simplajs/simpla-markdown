@@ -153,6 +153,7 @@
         }
 
         Polymer.dom(this).innerHTML = value;
+        this.fire('render');
       },
 
       /**
