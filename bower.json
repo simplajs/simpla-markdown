@@ -4,11 +4,14 @@
   "authors": [
     "Simpla"
   ],
-  "description": "A Simpla element for writing articles in markdown",
+  "description": "A markdown writer for the Simpla content system",
   "keywords": [
-    "web-component",
-    "polymer",
-    "simpla-markdown"
+    "simpla",
+    "content",
+    "markdown",
+    "cms",
+    "custom element",
+    "web component"
   ],
   "main": "simpla-markdown.html",
   "license": "MIT",

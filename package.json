@@ -1,7 +1,7 @@
 {
   "name": "simpla-markdown",
   "version": "0.3.3",
-  "description": "A Simpla element for writing articles in markdown",
+  "description": "A markdown writer for the Simpla content system",
   "main": "simpla-markdown.html",
   "scripts": {
     "test": "gulp test:local"
@@ -9,8 +9,12 @@
   "author": "Simpla",
   "license": "MIT",
   "keywords": [
-    "web components",
-    "simpla-markdown"
+    "simpla",
+    "content",
+    "markdown",
+    "cms",
+    "custom element",
+    "web component"
   ],
   "repository": {
     "type": "git",
@@ -18,6 +22,12 @@
   },
   "bugs": {
     "url": "https://github.com/SimplaElements/simpla-markdown/issues"
+  },
+  "dependencies": {
+    "markdown-it": "^8.2.2",
+    "reading-time": "^1.1.0",
+    "simplemde": "^1.11.2",
+    "to-markdown": "^3.0.4"
   },
   "devDependencies": {
     "autoprefixer": "^6.0.0",
@@ -38,17 +48,13 @@
     "gulp-process-inline": "^0.1.1",
     "gulp-rollup-file": "^0.1.0",
     "gulp-size": "^2.0.0",
-    "markdown-it": "^8.2.2",
     "postcss-import": "^9.1.0",
-    "reading-time": "^1.1.0",
     "rollup-plugin-babel": "^2.6.0",
     "rollup-plugin-commonjs": "^7.0.0",
     "rollup-plugin-json": "^2.1.0",
     "rollup-plugin-node-resolve": "^2.0.0",
     "run-sequence": "^1.1.5",
-    "simplemde": "^1.11.2",
     "web-component-tester": "^5.0.0",
     "yargs": "^6.6.0"
-  },
-  "dependencies": {}
+  }
 }

@@ -50,10 +50,8 @@
 
     <!-- Editor imported on editable true -->
     <simpla-markdown-editor
-      id="editor"
-      value="{{_value}}"
-      active="{{active}}"
-      toolbar="[[!hideToolbar]]">
+      html="{{value}}"
+      active="{{active}}">
     </simpla-markdown-editor>
 
     <div class="content" data-editing$="[[active]]">
@@ -78,13 +76,9 @@
   </template>
 
   <script>
-    import MarkdownIt from 'markdown-it';
     import simpla from './behaviors/simpla';
 
-    const EDITOR_COMPONENT = 'simpla-markdown-editor.html',
-          MARKDOWN_OPTS = {
-            typographer: true
-          };
+    const EDITOR_COMPONENT = 'simpla-markdown-editor.html';
 
     Polymer({
       is: 'simpla-markdown',
@@ -92,19 +86,13 @@
       properties: {
 
         /**
-         * Markdown source (fetched from Simpla)
+         * Rendered HTML content
          * @type {String}
          */
         value: {
           type: String,
-          notify: true
+          value: ''
         },
-
-        /**
-         * Internal markdown source (set to Simpla)
-         * @type {String}
-         */
-        _value: String,
 
         /**
          * Whether element is editable
@@ -133,78 +121,16 @@
         placeholder: {
           type: String,
           value: 'Tap to start writing...'
-        },
-
-        /**
-         * Render HTML in source markdown
-         * @type {Boolean}
-         */
-        allowHtml: {
-          type: Boolean,
-          value: false
-        },
-
-        /**
-         * Automatically render URLs as anchors
-         * @type {Boolean}
-         */
-        linkify: {
-          type: Boolean,
-          value: false
-        },
-
-        /**
-         * Hide the toolbar
-         * @type {Object}
-         */
-        hideToolbar: {
-          type: Boolean,
-          value: false
-        },
-
-        /**
-         * Whether editor component has been imported
-         * @type {Boolean}
-         */
-        _editorImported: Boolean,
-
-        /**
-         * Markdown-it instance
-         * @type {Object}
-         */
-        _parser: Object
+        }
       },
 
       observers: [
         '_render(value, active)',
-        '_setMarkdownOpts(allowHtml, linkify)',
         '_importEditor(editable)',
-        '_ensureEditorInactiveWhenNotEditable(editable)'
+        '_ensureInactiveWhenNotEditable(editable)'
       ],
 
       behaviors: [ simpla ],
-
-      /**
-       * Initialises markdown-it instance
-       * Called by Polymer on element creation
-       * @return {undefined}
-       */
-      created: function() {
-        this._parser = new MarkdownIt(MARKDOWN_OPTS);
-      },
-
-      /**
-       * Set options on MarkdownIt dynamically
-       * @param {Boolean} allowHtml Value of allowHtml prop
-       * @param {Boolean} linkify   Value of linkfy prop
-       * @return {undefined}
-       */
-      _setMarkdownOpts: function(allowHtml, linkify) {
-        this._parser && this._parser.set({
-          html: allowHtml,
-          linkify: linkify
-        });
-      },
 
       /**
        * Imports editor component when editable true
@@ -212,49 +138,32 @@
        * @return {undefined}
        */
       _importEditor: function(editable) {
-        let link;
-
-        if (!editable || this._editorImported) {
-          return;
-        }
-
-        link =  document.createElement('link');
-        link.rel = 'import';
-        link.href = this.resolveUrl(EDITOR_COMPONENT);
-        document.head.appendChild(link);
-
-        this._editorImported = true;
+        this.importHref(this.resolveUrl(EDITOR_COMPONENT));
       },
 
       /**
-       * Set editor active false when editable is fale
-       * @param  {Boolean} editable Whether element is editable
+       * Render saved HTML content to element's Light DOM
+       * @param  {String} value  HTML content to render
+       * @param  {String} active Whether the editor is open
        * @return {undefined}
        */
-      _ensureEditorInactiveWhenNotEditable: function(editable) {
-        if (!editable) {
-          this.$.editor.active = false;
-        }
-      },
-
-      /**
-       * Render markdown source to innerHTML (Light DOM)
-       * @param  {String} value   Markdown source to render
-       * @param  {Boolean} active Whether editor is open
-       * @return {undefined}
-       */
-      _render: function(value, active) {
-        // Don't render while the editor is open
+      _render(value, active) {
         if (active) {
           return;
         }
 
-        Polymer.dom(this).innerHTML = this._parser.render(value || '');
+        Polymer.dom(this).innerHTML = value;
+      },
 
-        // Ensure element's innerHTML is updated before firing render
-        Polymer.dom.flush();
-
-        this.fire('render');
+      /**
+       * Set editor active false when editable is false
+       * @param  {Boolean} editable Whether element is editable
+       * @return {undefined}
+       */
+      _ensureInactiveWhenNotEditable: function(editable) {
+        if (!editable) {
+          this.active = false;
+        }
       },
 
       /**

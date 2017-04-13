@@ -253,103 +253,101 @@
       </a>
 
       <!-- Custom toolbar -->
-      <template is="dom-if" if="[[toolbar]]">
-        <div class="toolbar">
-          <a class="toolbar__tool"
-            on-tap="format"
-            title="Bold"
-          >
-            <iron-icon
-              class="toolbar__tool__icon"
-              icon="simpla-markdown:format-bold"
-              data-action="toggleBold">
-            </iron-icon>
-          </a>
+      <div class="toolbar">
+        <a class="toolbar__tool"
+          on-tap="format"
+          title="Bold"
+        >
+          <iron-icon
+            class="toolbar__tool__icon"
+            icon="simpla-markdown:format-bold"
+            data-action="toggleBold">
+          </iron-icon>
+        </a>
 
-          <a class="toolbar__tool"
-            on-tap="format"
-            title="Italic"
-          >
-            <iron-icon
-              class="toolbar__tool__icon"
-              icon="simpla-markdown:format-italic"
-              data-action="toggleItalic">
-            </iron-icon>
-          </a>
+        <a class="toolbar__tool"
+          on-tap="format"
+          title="Italic"
+        >
+          <iron-icon
+            class="toolbar__tool__icon"
+            icon="simpla-markdown:format-italic"
+            data-action="toggleItalic">
+          </iron-icon>
+        </a>
 
-          <div class="toolbar__separator"></div>
+        <div class="toolbar__separator"></div>
 
-          <a class="toolbar__tool"
-            on-tap="format"
-            title="Heading"
-          >
-            <iron-icon
-              class="toolbar__tool__icon"
-              icon="simpla-markdown:title"
-              data-action="toggleHeadingSmaller">
-            </iron-icon>
-          </a>
+        <a class="toolbar__tool"
+          on-tap="format"
+          title="Heading"
+        >
+          <iron-icon
+            class="toolbar__tool__icon"
+            icon="simpla-markdown:title"
+            data-action="toggleHeadingSmaller">
+          </iron-icon>
+        </a>
 
-          <a class="toolbar__tool"
-            on-tap="format"
-            title="Unordered list"
-          >
-            <iron-icon
-              class="toolbar__tool__icon"
-              icon="simpla-markdown:format-list-bulleted"
-              data-action="toggleUnorderedList">
-            </iron-icon>
-          </a>
+        <a class="toolbar__tool"
+          on-tap="format"
+          title="Unordered list"
+        >
+          <iron-icon
+            class="toolbar__tool__icon"
+            icon="simpla-markdown:format-list-bulleted"
+            data-action="toggleUnorderedList">
+          </iron-icon>
+        </a>
 
-          <a class="toolbar__tool"
-            on-tap="format"
-            title="Ordered list"
-          >
-            <iron-icon
-              class="toolbar__tool__icon"
-              icon="simpla-markdown:format-list-numbered"
-              data-action="toggleOrderedList">
-            </iron-icon>
-          </a>
+        <a class="toolbar__tool"
+          on-tap="format"
+          title="Ordered list"
+        >
+          <iron-icon
+            class="toolbar__tool__icon"
+            icon="simpla-markdown:format-list-numbered"
+            data-action="toggleOrderedList">
+          </iron-icon>
+        </a>
 
-          <div class="toolbar__separator"></div>
+        <div class="toolbar__separator"></div>
 
-          <a class="toolbar__tool"
-            on-tap="format"
-            title="Insert link"
-          >
-            <iron-icon
-              class="toolbar__tool__icon"
-              icon="simpla-markdown:insert-link"
-              data-action="drawLink">
-            </iron-icon>
-          </a>
+        <a class="toolbar__tool"
+          on-tap="format"
+          title="Insert link"
+        >
+          <iron-icon
+            class="toolbar__tool__icon"
+            icon="simpla-markdown:insert-link"
+            data-action="drawLink">
+          </iron-icon>
+        </a>
 
-          <a class="toolbar__tool"
-            on-tap="format"
-            title="Insert image"
-          >
-            <iron-icon
-              class="toolbar__tool__icon"
-              icon="simpla-markdown:insert-photo"
-              data-action="drawImage">
-            </iron-icon>
-          </a>
+        <a class="toolbar__tool"
+          on-tap="format"
+          title="Insert image"
+        >
+          <iron-icon
+            class="toolbar__tool__icon"
+            icon="simpla-markdown:insert-photo"
+            data-action="drawImage">
+          </iron-icon>
+        </a>
 
-          <div class="toolbar__separator"></div>
+        <div class="toolbar__separator"></div>
 
-          <a class="toolbar__tool"
-            on-tap="format"
-            title="Clear formatting"
-          >
-            <iron-icon
-              class="toolbar__tool__icon"
-              icon="simpla-markdown:format-clear"
-              data-action="cleanBlock">
-            </iron-icon>
-          </a>
-        </div>
-      </template>
+        <a class="toolbar__tool"
+          on-tap="format"
+          title="Clear formatting"
+        >
+          <iron-icon
+            class="toolbar__tool__icon"
+            icon="simpla-markdown:format-clear"
+            data-action="cleanBlock">
+          </iron-icon>
+        </a>
+      </div>
 
       <!-- Editor instantiated with SimpleMDE -->
       <textarea id="editor" hidden></textarea>
@@ -358,6 +356,8 @@
   </template>
   <script>
     import SimpleMde from 'simplemde';
+    import MarkdownIt from 'markdown-it';
+    import toMarkdown from 'to-markdown';
     import readingTime from 'reading-time';
 
     const SIMPLEMDE_CONFIG = {
@@ -388,6 +388,7 @@
 
     Polymer({
       is: 'simpla-markdown-editor',
+
       properties: {
 
         /**
@@ -423,19 +424,13 @@
         },
 
         /**
-         * Markdown source
+         * Rendered Markdown source
          * @type {String}
          */
-        value: {
+        html: {
           type: String,
           notify: true
         },
-
-        /**
-         * Whether to show the toolbar
-         * @type {Boolean}
-         */
-        toolbar: Boolean,
 
         /**
          * Current value of the editor
@@ -447,7 +442,13 @@
          * SimpleMDE instance
          * @type {Object}
          */
-        _editor: Object
+        _editor: Object,
+
+        /**
+         * MarkdownIt instance
+         * @type {Object}
+         */
+        _parser: Object
 
       },
 
@@ -469,20 +470,30 @@
        */
       attached: function() {
         let editor = new SimpleMde(Object.assign({
-          element: this.$['editor'],
-          status: [
-            'words',
-            {
-              className: 'readingTime',
-              defaultValue: (el) => el.innerHTML = readingTime(this.value || '').text,
-              onUpdate: (el) => el.innerHTML = readingTime(this._currentValue || '').text
-            }
-          ],
-        }, SIMPLEMDE_CONFIG));
+              element: this.$['editor'],
+              status: [
+                'words',
+                {
+                  className: 'readingTime',
+                  defaultValue: (el) => el.innerHTML = readingTime(this.value || '').text,
+                  onUpdate: (el) => el.innerHTML = readingTime(this._currentValue || '').text
+                }
+              ],
+            }, SIMPLEMDE_CONFIG)),
+            parser = new MarkdownIt({
+              html: true,
+              linkify: true,
+              typographer: true
+            });
 
-        editor.codemirror.on('change', () => this._syncValue('out'));
+        editor.codemirror.on('change', () => {
+          this.debounce('writeOut', () => {
+            this._syncValue('out');
+          }, 100)
+        });
 
         this._editor = editor;
+        this._parser = parser;
       },
 
       /**
@@ -557,10 +568,14 @@
        * @return {undefined}
        */
       _syncValue: function(direction) {
+        if (!this._editor || !this._parser) {
+          return;
+        }
+
         if (direction === 'in') {
-          this._editor.value(this.value);
+          this._editor.value(toMarkdown(this.html));
         } else {
-          this.value = this._editor.value()
+          this.html = this._parser.render(this._editor.value());
         }
       },
 

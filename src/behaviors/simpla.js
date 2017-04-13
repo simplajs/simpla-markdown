@@ -21,7 +21,7 @@ export default {
   },
 
   observers: [
-    '_setData(_value, path)'
+    '_updateBuffer(value, path)'
   ],
 
   /**
@@ -59,42 +59,12 @@ export default {
 
   /**
    * Init the data / buffer observer whenever path changes
-   * @param  {String} path Current value of path prop
+   * @param  {String} path Path to content on Simpla's API
    * @return {undefined}
    */
   _initPath(path) {
-    Simpla.get(path)
-      .then(item => {
-        if (item.path === path) {
-          if (item && item.data) {
-            if (this._value === item.data.markdown) {
-              this.value = item.data.markdown;
-            } else {
-              this._value = item.data.markdown;
-            }
-          } else {
-            this._value = '';
-          }
-        }
-      });
-
-    // Setup data observer for future changes
     this._observeBuffer(path);
-  },
-
-  /**
-   * Set internal value to Simpla on change
-   * @param {String} value Internal markdown source
-   * @param {String} path  Element path
-   * @return {Promise}
-   */
-  _setData(value, path) {
-    this.value = value;
-
-    return Simpla.set(path, {
-      type: 'Article',
-      data: { markdown: value }
-    });
+    Simpla.get(path);
   },
 
   /**
@@ -109,14 +79,23 @@ export default {
       return;
     }
 
-    if (observers.buffer) {
-      observers.buffer.unobserve();
-    }
+    observers.buffer && observers.buffer.unobserve();
 
     observers.buffer = Simpla.observe(path, item => {
-      if (item.path === path) {
-        this.value = item && item.data ? item.data.markdown : '';
-      }
+      this.value = item.data.html || '';
+    });
+  },
+
+  /**
+   * Set value to Simpla on change
+   * @param {String} value Internal markdown source
+   * @param {String} path  Element path
+   * @return {Promise}
+   */
+  _updateBuffer(value, path) {
+    return Simpla.set(path, {
+      type: 'Article',
+      data: { html: value }
     });
   },
 
