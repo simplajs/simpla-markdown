@@ -1,11 +1,3 @@
-const warnOnInvalidPath = error => {
-  if (error.message.toLowerCase().indexOf('invalid path') !== -1) {
-    console.warn(error.message);
-  } else {
-    throw error;
-  }
-}
-
 export default {
   properties: {
     /**
@@ -73,9 +65,18 @@ export default {
   _initPath(path) {
     Simpla.get(path)
       .then(item => {
-        this._value = item && item.data ? item.data.markdown : ''
-      })
-      .catch(warnOnInvalidPath);
+        if (item.path === path) {
+          if (item && item.data) {
+            if (this._value === item.data.markdown) {
+              this.value = item.data.markdown;
+            } else {
+              this._value = item.data.markdown;
+            }
+          } else {
+            this._value = '';
+          }
+        }
+      });
 
     // Setup data observer for future changes
     this._observeBuffer(path);
@@ -88,10 +89,12 @@ export default {
    * @return {Promise}
    */
   _setData(value, path) {
+    this.value = value;
+
     return Simpla.set(path, {
       type: 'Article',
       data: { markdown: value }
-    }).catch(warnOnInvalidPath);
+    });
   },
 
   /**
@@ -110,13 +113,11 @@ export default {
       observers.buffer.unobserve();
     }
 
-    try {
-      observers.buffer = Simpla.observe(path, item => {
+    observers.buffer = Simpla.observe(path, item => {
+      if (item.path === path) {
         this.value = item && item.data ? item.data.markdown : '';
-      });
-    } catch (error) {
-      warnOnInvalidPath(error);
-    }
+      }
+    });
   },
 
   /**
