@@ -21,7 +21,7 @@ export default {
   },
 
   observers: [
-    '_updateBuffer(value, path)'
+    '_updateBuffer(value)'
   ],
 
   /**
@@ -63,8 +63,13 @@ export default {
    * @return {undefined}
    */
   _initPath(path) {
+    if (!path) {
+      return;
+    }
+
     this._observeBuffer(path);
-    Simpla.get(path);
+    Simpla.get(path)
+      .then(item => this._setValue(item));
   },
 
   /**
@@ -75,15 +80,11 @@ export default {
   _observeBuffer(path) {
     let observers = this._simplaObservers;
 
-    if (!path) {
-      return;
+    if (observers.buffer) {
+      observers.buffer.unobserve();
     }
 
-    observers.buffer && observers.buffer.unobserve();
-
-    observers.buffer = Simpla.observe(path, item => {
-      this.value = item.data.html || '';
-    });
+    observers.buffer = Simpla.observe(path, item => this._setValue(item));
   },
 
   /**
@@ -92,8 +93,12 @@ export default {
    * @param {String} path  Element path
    * @return {Promise}
    */
-  _updateBuffer(value, path) {
-    return Simpla.set(path, {
+  _updateBuffer(value) {
+    if (!this.path) {
+      return;
+    }
+
+    return Simpla.set(this.path, {
       type: 'Article',
       data: { html: value }
     });
@@ -115,5 +120,11 @@ export default {
     observers.editable = Simpla.observeState('editable',
       editable => this.editable = editable
     );
+  },
+
+  _setValue(item) {
+    if (item.path === this.path) {
+      this.value = item.data.html || '';
+    }
   }
 }
