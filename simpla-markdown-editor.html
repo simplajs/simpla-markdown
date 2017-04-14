@@ -30685,6 +30685,23 @@ var SIMPLEMDE_CONFIG = {
     'drawImage': null
   }
 };
+var TO_MARKDOWN_CONFIG = {
+  converters: [{
+    filter: function filter(node) {
+      var attributes = ['class', 'style', 'is'],
+          attrTest = attributes.some(function (attr) {
+        return node.hasAttribute(attr);
+      }),
+          dataTest = Object.keys(node.dataset).length > 0;
+
+      return attrTest || dataTest;
+    },
+    replacement: function replacement(innerHTML, node) {
+      return node.outerHTML;
+    }
+  }],
+  gfm: true
+};
 
 Polymer({
   is: 'simpla-markdown-editor',
@@ -30874,7 +30891,7 @@ Polymer({
     }
 
     if (direction === 'in') {
-      this._editor.value(index$11(this.html, { gfm: true }));
+      this._editor.value(index$11(this.html, TO_MARKDOWN_CONFIG));
     } else {
       this.html = this._parser.render(this._editor.value());
     }

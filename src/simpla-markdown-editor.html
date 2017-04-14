@@ -361,30 +361,45 @@
     import readingTime from 'reading-time';
 
     const SIMPLEMDE_CONFIG = {
-      autoDownloadFontAwesome: false,
-      indentWithTabs: false,
-      styleSelectedText: false,
-      tabSize: 4,
-      toolbarTips: false,
-      spellChecker: false,
-      blockStyles: {
-        italic: '_'
-      },
-      insertTexts: {
-        image: ['![](', ')'],
-        link: ['[', ']()']
-      },
-      toolbar: [],
-      shortcuts: {
-        'toggleSideBySide': null,
-        'toggleFullScreen': null,
-        'togglePreview': null,
-        'toggleUnorderedList': null,
-        'toggleOrderedList': null,
-        'cleanBlock': null,
-        'drawImage': null
-      }
-    };
+            autoDownloadFontAwesome: false,
+            indentWithTabs: false,
+            styleSelectedText: false,
+            tabSize: 4,
+            toolbarTips: false,
+            spellChecker: false,
+            blockStyles: {
+              italic: '_'
+            },
+            insertTexts: {
+              image: ['![](', ')'],
+              link: ['[', ']()']
+            },
+            toolbar: [],
+            shortcuts: {
+              'toggleSideBySide': null,
+              'toggleFullScreen': null,
+              'togglePreview': null,
+              'toggleUnorderedList': null,
+              'toggleOrderedList': null,
+              'cleanBlock': null,
+              'drawImage': null
+            }
+          },
+          TO_MARKDOWN_CONFIG = {
+            converters: [
+              {
+                filter: (node) => {
+                  let attributes = ['class', 'style', 'is'],
+                      attrTest = attributes.some(attr => node.hasAttribute(attr)),
+                      dataTest = Object.keys(node.dataset).length > 0;
+
+                  return attrTest || dataTest;
+                },
+                replacement: (innerHTML, node) => node.outerHTML
+              }
+            ],
+            gfm: true
+          };
 
     Polymer({
       is: 'simpla-markdown-editor',
@@ -573,7 +588,7 @@
         }
 
         if (direction === 'in') {
-          this._editor.value(toMarkdown(this.html, { gfm: true }));
+          this._editor.value(toMarkdown(this.html, TO_MARKDOWN_CONFIG));
         } else {
           this.html = this._parser.render(this._editor.value());
         }
