@@ -27,7 +27,7 @@
     "markdown-it": "^8.2.2",
     "reading-time": "^1.1.0",
     "simplemde": "^1.11.2",
-    "to-markdown": "^3.0.4"
+    "to-markdown": "zeke/to-markdown#e29c58ea38cd63ae75cac351f7d7aca940c4ca85"
   },
   "devDependencies": {
     "autoprefixer": "^6.0.0",

@@ -29907,7 +29907,7 @@ function cell (content, node) {
   return prefix + content + ' |'
 }
 
-var highlightRegEx = /highlight highlight-(\S+)/;
+var highlightRegEx = /(?:highlight|language|lang)-(\S+)/;
 
 var gfmConverters$1 = [
   {
@@ -29973,7 +29973,21 @@ var gfmConverters$1 = [
     }
   },
 
-  // Fenced code blocks
+  // Syntax-highlighted code blocks (markdown-it style)
+  {
+    filter: function (node) {
+      return node.nodeName === 'PRE' &&
+      node.firstChild &&
+      node.firstChild.nodeName === 'CODE' &&
+      highlightRegEx.test(node.firstChild.className)
+    },
+    replacement: function (content, node) {
+      var language = node.firstChild.className.match(highlightRegEx)[1];
+      return '\n\n```' + language + '\n' + node.firstChild.textContent.trim() + '\n```\n\n'
+    }
+  },
+
+  // Language-agnostic fence code blocks
   {
     filter: function (node) {
       return node.nodeName === 'PRE' &&
