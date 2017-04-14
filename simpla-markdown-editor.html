@@ -30874,7 +30874,7 @@ Polymer({
     }
 
     if (direction === 'in') {
-      this._editor.value(index$11(this.html));
+      this._editor.value(index$11(this.html, { gfm: true }));
     } else {
       this.html = this._parser.render(this._editor.value());
     }
