@@ -79,7 +79,9 @@
   <script>
     const SIMPLA_CONFIG = {
             type: 'Article',
-            dataProperties: [ 'value' ]
+            dataProperties: [ 'value' ],
+            getCallback: '_loadFromSimpla',
+            setCallback: '_dataForSimpla'
           },
           EDITOR_COMPONENT = 'simpla-markdown-editor.html';
 
@@ -185,6 +187,25 @@
        */
       _hasContent: function(value) {
         return !!value.trim();
+      },
+
+      /**
+       * Callback to load content in from Simpla
+       * @param  {Object} item Simpla item
+       * @return {undefined}
+       */
+      _loadFromSimpla(item) {
+        if (item && item.data) {
+          this.value = item.data.html;
+        }
+      },
+
+      /**
+       * Callback to get data to be sent to Simpla
+       * @return {Object} Simpla data object
+       */
+      _dataForSimpla() {
+        return { html: this.value };
       }
     });
   </script>
