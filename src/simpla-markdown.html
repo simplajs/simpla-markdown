@@ -158,6 +158,7 @@
         }
 
         Polymer.dom(this).innerHTML = value;
+        Polymer.dom.flush();
         this.fire('render');
       },
 
